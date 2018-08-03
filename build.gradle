@@ -1,0 +1,6 @@
+group 'scientifik.kplot'
+version '1.0-SNAPSHOT'
+
+repositories{
+    mavenCentral()
+}
