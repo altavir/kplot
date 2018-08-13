@@ -1,11 +1,18 @@
 package scietifik.kplot.jfreechart
 
+import javafx.application.Platform.runLater
 import org.jfree.chart.JFreeChart
 import org.jfree.chart.axis.NumberAxis
 import org.jfree.chart.plot.XYPlot
+import org.jfree.chart.renderer.xy.XYErrorRenderer
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer
+import org.jfree.chart.renderer.xy.XYSplineRenderer
+import org.jfree.chart.renderer.xy.XYStepRenderer
 import scientifik.kplot.common.*
-import java.util.*
+import java.awt.BasicStroke
+import java.awt.Color
+import java.awt.Shape
+import java.util.stream.Collectors
 import kotlin.math.absoluteValue
 
 class JFreeChartFrame : PlotFrame {
@@ -13,23 +20,25 @@ class JFreeChartFrame : PlotFrame {
     private val xyPlot: XYPlot = XYPlot(null, NumberAxis(), NumberAxis(), XYLineAndShapeRenderer())
     private val chart: JFreeChart = JFreeChart(xyPlot)
 
+    private val colorCache = HashMap<String, Color>()
+    private val shapeCache = HashMap<String, Shape>()
+
     /**
      * String to number index for this chart
      */
     private val index = HashMap<String, Int>()
 
-    override val layout: Layout
-        get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
+    override var layout: Layout = JFreeChartLayout()
+        set(value) {
+            field = value
+            updateFrame()
+            value.onChange { _, _ ->
+                updateFrame()
+            }
+        }
 
     override fun get(key: String): JFreeChartPlot? {
         return index[key]?.let { xyPlot.getDataset(it) } as JFreeChartPlot?
-    }
-
-    /**
-     * Update renderer for given key
-     */
-    private fun render(key: String) {
-
     }
 
     override fun set(key: String, plot: Plot) {
@@ -58,7 +67,67 @@ class JFreeChartFrame : PlotFrame {
         }
     }
 
-    override fun append(key: String, data: PlotData) {
-        get(key)?.append(data)
+//    override fun append(key: String, data: PlotData) {
+//        get(key)?.let{
+//            it.append(data)
+//            xyPlot.datasetChanged(DatasetChangeEvent(this.xyPlot, it))
+//        }
+//    }
+
+
+    /**
+     * Update frame configuration based on layout
+     */
+    private fun updateFrame() {
+
+    }
+
+    /**
+     * Update renderer for given key
+     */
+    private fun render(key: String) {
+        index[key]?.let {
+            val plot = xyPlot.getDataset(it) as JFreeChartPlot
+            val render = plot.createRenderer(key)
+            runLater {
+                xyPlot.setRenderer(it, render)
+
+                // update cache to default colors
+                val paint = render.lookupSeriesPaint(0)
+                if (paint is Color) {
+                    colorCache[key] = paint
+                }
+                shapeCache[key] = render.lookupSeriesShape(0)
+            }
+        }
+
+    }
+
+    private fun JFreeChartPlot.createRenderer(key: String): XYLineAndShapeRenderer {
+        val render: XYLineAndShapeRenderer = if (showErrors) {
+            XYErrorRenderer()
+        } else {
+            when (connectionType) {
+                JFreeChartPlot.ConnectionType.STEP -> XYStepRenderer()
+                JFreeChartPlot.ConnectionType.SPLINE -> XYSplineRenderer()
+                else -> XYLineAndShapeRenderer()
+            }
+        }
+
+        render.defaultShapesVisible = showSymbols
+        render.defaultLinesVisible = showLines
+
+        //Build Legend map to avoid serialization issues
+        render.setSeriesStroke(0, BasicStroke(thickness.toFloat()))
+
+        (awtColor ?: colorCache[key])?.let { render.setSeriesPaint(0, it) }
+
+        shapeCache[key]?.let { render.setSeriesShape(0, it) }
+
+        render.setSeriesVisible(0, visible)
+
+        render.setLegendItemLabelGenerator { dataset, series -> title ?: dataset.getSeriesKey(series).toString() }
+
+        return render
     }
 }

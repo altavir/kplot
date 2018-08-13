@@ -1,6 +1,27 @@
+buildscript {
+    ext.kotlin_version = '1.2.60'
+    ext.serialization_version = '0.6.1'
+    repositories {
+        jcenter()
+        maven { url "https://kotlin.bintray.com/kotlinx" }
+    }
+
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath "org.jetbrains.kotlinx:kotlinx-gradle-serialization-plugin:$serialization_version"
+    }
+}
+
+subprojects{
+    repositories {
+        maven { url "https://kotlin.bintray.com/kotlinx" }
+    }
+}
+
+
 group 'scientifik.kplot'
 version '1.0-SNAPSHOT'
 
-repositories{
+repositories {
     mavenCentral()
 }

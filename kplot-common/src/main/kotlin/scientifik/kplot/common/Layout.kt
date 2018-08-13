@@ -5,7 +5,7 @@ package scientifik.kplot.common
  * Axis configuration
  */
 interface AxisLayout : Config {
-    enum class AxisType{
+    enum class AxisType {
         AUTO,
         LINEAR,
         LOG,
@@ -13,9 +13,9 @@ interface AxisLayout : Config {
         CATEGORY
     }
 
-    val type: AxisType
+    var type: AxisType
 
-    val title: String
+    var title: String
 }
 
 /**
@@ -31,4 +31,27 @@ interface LegendLayout : Config {
 interface Layout : Config {
     fun getAxis(axis: String): AxisLayout
     val legend: LegendLayout
+}
+
+class ConfigLegend(config: Config) : LegendLayout, Config by config {
+
+}
+
+class ConfigAxis(config: Config): AxisLayout, Config by config{
+    override var type: AxisLayout.AxisType
+        get() = AxisLayout.AxisType.valueOf(this["type"].string)
+        set(value) {
+            this["type"] = value.name
+        }
+
+    override var title: String by Config.string()
+}
+
+class ConfigLayout(config: Config) : Layout, Config by config {
+    override fun getAxis(axis: String): AxisLayout {
+        return ConfigAxis(getChild("axis[$axis]"))
+    }
+
+    override val legend: LegendLayout = ConfigLegend(getChild("legend"))
+
 }

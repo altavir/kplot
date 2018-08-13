@@ -1,5 +1,6 @@
 package scientifik.kplot.common
 
+import kotlin.jvm.JvmName
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 
@@ -51,15 +52,26 @@ interface Config {
     infix fun String.to(action: Config.() -> Unit)
 
     companion object {
-        /**
-         * A generic property delegate that uses its name to resolve the value
-         */
-        val property = PropertyHolderDelegate()
 
         /**
          * A property delegate that uses custom key
          */
-        fun property(key: String) = PropertyHolderDelegate(key)
+        fun value(key: String? = null, default: Value = null) = ConfigDelegate(key, default)
+
+        fun string(key: String? = null, default: String? = null) = StringConfigDelegate(key, default)
+
+        fun boolean(key: String? = null, default: Boolean? = null) = BooleanConfigDelegate(key, default)
+
+        fun number(key: String? = null, default: Number? = null) = NumberConfigDelegate(key, default)
+
+        @JvmName("safeString")
+        fun string(key: String? = null, default: String) = SafeStringConfigDelegate(key, default)
+
+        @JvmName("safeBoolean")
+        fun boolean(key: String? = null, default: Boolean) = SafeBooleanConfigDelegate(key, default)
+
+        @JvmName("safeNumber")
+        fun number(key: String? = null, default: Number) = SafeNumberConfigDelegate(key, default)
     }
 }
 
@@ -70,9 +82,37 @@ fun Config.update(other: Config) {
 }
 
 /**
+ * A decorator config node that delegates everything to parent
+ */
+class ChildConfig(private val parent: Config, private val path: String) : Config {
+    override fun get(key: String): Value = parent["$path.$key"]
+
+    override fun set(key: String, value: Value) {
+        parent["$path.$key"] = value
+    }
+
+    override val keys: Collection<String> = parent.keys.filter { it.startsWith(path) }
+
+
+    override fun onChange(listener: PropertyChangeListener) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun removeListener(listener: PropertyChangeListener) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun invalidate(key: String) = parent.invalidate("$path.$key")
+
+    override fun String.to(action: Config.() -> Unit) = with(parent) { "$path.${this@to}" to action }
+}
+
+fun Config.getChild(path: String) = ChildConfig(this, path)
+
+/**
  * Basic implementation for a property holder
  */
-class PropertyMap(private val map: MutableMap<String, Value> = HashMap()) : Config {
+class ConfigMap(private val map: MutableMap<String, Value> = HashMap()) : Config {
     private val listeners: MutableSet<PropertyChangeListener> = HashSet()
 
     override val keys: Collection<String> = map.keys
@@ -82,7 +122,7 @@ class PropertyMap(private val map: MutableMap<String, Value> = HashMap()) : Conf
      * the search is delegated to the entry found by the first token separated by `.`. The use of `.` in names should be avoided
      */
     override fun get(key: String): Value = map[key] ?: run {
-        (map[key.substringBefore(".")] as? PropertyMap)?.get(key.substringAfter("."))
+        (map[key.substringBefore(".")] as? ConfigMap)?.get(key.substringAfter("."))
     }
 
     /**
@@ -100,7 +140,7 @@ class PropertyMap(private val map: MutableMap<String, Value> = HashMap()) : Conf
     }
 
     override infix fun String.to(action: Config.() -> Unit) {
-        val holder = PropertyMap().apply(action)
+        val holder = ConfigMap().apply(action)
         holder.onChange { key, value ->
             invalidate("${this}.$key")
         }
@@ -118,16 +158,4 @@ class PropertyMap(private val map: MutableMap<String, Value> = HashMap()) : Conf
     override fun invalidate(key: String) {
         listeners.forEach { it.invoke(key, get(key)) }
     }
-}
-
-class PropertyHolderDelegate(private val key: String? = null) : ReadWriteProperty<Config, Value> {
-
-    override fun getValue(thisRef: Config, property: KProperty<*>): Value {
-        return thisRef[key ?: property.name]
-    }
-
-    override fun setValue(thisRef: Config, property: KProperty<*>, value: Value) {
-        thisRef[key ?: property.name] = value
-    }
-
 }

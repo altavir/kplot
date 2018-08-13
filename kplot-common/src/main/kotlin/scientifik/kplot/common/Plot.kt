@@ -63,7 +63,7 @@ interface PlotFrame {
     /**
      * A configuration for the plot
      */
-    val layout: Layout
+    var layout: Layout
 
     /**
      * Get existing plot or return null is it is not present
@@ -86,8 +86,8 @@ interface PlotFrame {
      */
     fun configure(key: String, config: Config)
 
-    /**
-     * Append data to given plot. Not all plots allow this operation and [data] shape (axes names) must be compatible
-     */
-    fun append(key: String, data: PlotData)
+//    /**
+//     * Append data to given plot. Not all plots allow this operation and [data] shape (axes names) must be compatible
+//     */
+//    fun append(key: String, data: PlotData)
 }
