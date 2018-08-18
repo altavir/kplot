@@ -146,7 +146,7 @@ class ConfigMap(private val map: MutableMap<String, Value> = HashMap()) : Config
     }
 
     override fun String.to(config: Config) {
-        config.onChange { key, value ->
+        config.onChange { key, _ ->
             invalidate("${this}.$key")
         }
         set(this, config)

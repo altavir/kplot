@@ -62,12 +62,13 @@ class JFreeChartFrame(title: String? = null, config: Config? = null) : Fragment(
     }
 
     override fun set(key: String, plot: Plot) {
-        synchronized(this) {
+        synchronized(this){
             val i = plot.hashCode().absoluteValue
             if (index.containsKey(key)) {
                 index.remove(key)
             }
-            xyPlot.setDataset(i, JFreeChartPlot.wrap(plot))
+            val wrapper = JFreeChartPlot.wrap(plot)
+            xyPlot.setDataset(i, wrapper)
             index[key] = i
             render(key)
         }

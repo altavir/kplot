@@ -37,8 +37,8 @@ class SimplePlotDataBuilder(override val axes: List<String>) : MutablePlotData {
     override fun get(axis: String): List<Value> = data[axis]
             ?: throw IllegalStateException("Axis with name $axis not found")
 
-    override var size: Int = 0
-        private set
+    override val size: Int
+        get() = data.values.first().size
 
     override fun append(map: Map<String, Value>) {
         synchronized(this) {
@@ -76,7 +76,7 @@ class SimplePlotDataBuilder(override val axes: List<String>) : MutablePlotData {
  */
 class SimplePlot(override val data: PlotData, override val config: Config) : Plot
 
-fun MutablePlotData.appendXY(x: Value, y:Value) = append(Plot.X_AXIS to x, Plot.X_AXIS to y)
+fun MutablePlotData.appendXY(x: Value, y:Value) = append(Plot.X_AXIS to x, Plot.Y_AXIS to y)
 
 fun xyPlot(config: Config = ConfigMap(), builder: MutablePlotData.() -> Unit): SimplePlot {
     return SimplePlot(SimplePlotDataBuilder(listOf(Plot.X_AXIS, Plot.Y_AXIS)).apply(builder), config)

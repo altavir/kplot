@@ -2,24 +2,17 @@ plugins {
     id 'kotlin-platform-jvm'
 }
 
-description = "A JavaFX jfreechart implementation for kplot API"
+description = "JVM examples"
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
-
-    // https://mvnrepository.com/artifact/org.jfree/jfreechart-fx
-    compile group: 'org.jfree', name: 'jfreechart-fx', version: '1.0.1'
-    compile 'no.tornado:tornadofx:1.7.16'
-
-    expectedBy project(":kplot-common")
+    compile project(":kplot-jfreechart")
 
     testCompile "org.jetbrains.kotlin:kotlin-test"
     testCompile "org.jetbrains.kotlin:kotlin-test-junit"
-
     testImplementation(
             'org.junit.jupiter:junit-jupiter-api:5.2.0'
     )
@@ -40,3 +33,9 @@ test {
 }
 
 sourceCompatibility = "1.8"
+
+task jfreechart(type: JavaExec){
+    group = "example"
+    classpath = sourceSets.main.runtimeClasspath
+    main = 'scientifik.kplot.examples.JFreeChartFrameTestKt'
+}

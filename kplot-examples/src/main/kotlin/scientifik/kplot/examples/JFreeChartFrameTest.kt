@@ -1,10 +1,10 @@
-package scietifik.kplot.jfreechart
+package scientifik.kplot.examples
 
 import javafx.application.Application
 import javafx.scene.Parent
-import org.junit.jupiter.api.Assertions.*
 import scientifik.kplot.common.appendXY
 import scientifik.kplot.common.xyPlot
+import scietifik.kplot.jfreechart.JFreeChartFrame
 import tornadofx.*
 
 class JFreeChartFrameTest : App(TestView::class)
@@ -18,7 +18,6 @@ internal class TestView : View() {
     override val root: Parent = frame.root
 
     init {
-
         frame["test"] = xyPlot {
             (1..100).forEach {
                 appendXY(it, it * it)
