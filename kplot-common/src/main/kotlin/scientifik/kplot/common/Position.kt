@@ -18,7 +18,7 @@ class Position(xRelative: Double, yRelative: Double, val parent: Position? = nul
         listeners.forEach { it.invoke(this) }
     }
 
-    var yRelative  by Delegates.observable(xRelative){_,_,_->
+    var yRelative  by Delegates.observable(yRelative){_,_,_->
         listeners.forEach { it.invoke(this) }
     }
 

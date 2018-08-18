@@ -1,5 +1,6 @@
 package scientifik.kplot.common
 
+import scientifik.kplot.common.config.*
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 

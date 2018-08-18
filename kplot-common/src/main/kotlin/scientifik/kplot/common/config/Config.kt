@@ -1,8 +1,7 @@
-package scientifik.kplot.common
+package scientifik.kplot.common.config
 
+import scientifik.kplot.common.*
 import kotlin.jvm.JvmName
-import kotlin.properties.ReadWriteProperty
-import kotlin.reflect.KProperty
 
 
 typealias PropertyChangeListener = (key: String, value: Value) -> Unit
@@ -47,9 +46,16 @@ interface Config {
     }
 
     /**
+     * Add the whole node to configuration
+     */
+    infix fun String.to(config: Config)
+
+    /**
      * Type safe builder method to add property node
      */
-    infix fun String.to(action: Config.() -> Unit)
+    infix fun String.to(action: Config.() -> Unit){
+        this to ConfigMap().apply(action)
+    }
 
     companion object {
 
@@ -104,7 +110,7 @@ class ChildConfig(private val parent: Config, private val path: String) : Config
 
     override fun invalidate(key: String) = parent.invalidate("$path.$key")
 
-    override fun String.to(action: Config.() -> Unit) = with(parent) { "$path.${this@to}" to action }
+    override fun String.to(config: Config) = with(parent) { "$path.${this@to}" to config }
 }
 
 fun Config.getChild(path: String) = ChildConfig(this, path)
@@ -139,12 +145,11 @@ class ConfigMap(private val map: MutableMap<String, Value> = HashMap()) : Config
         invalidate(key)
     }
 
-    override infix fun String.to(action: Config.() -> Unit) {
-        val holder = ConfigMap().apply(action)
-        holder.onChange { key, value ->
+    override fun String.to(config: Config) {
+        config.onChange { key, value ->
             invalidate("${this}.$key")
         }
-        set(this, holder)
+        set(this, config)
     }
 
     override fun onChange(listener: PropertyChangeListener) {

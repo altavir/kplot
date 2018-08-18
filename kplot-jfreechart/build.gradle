@@ -13,12 +13,19 @@ dependencies {
 
     // https://mvnrepository.com/artifact/org.jfree/jfreechart-fx
     compile group: 'org.jfree', name: 'jfreechart-fx', version: '1.0.1'
+    compile 'no.tornado:tornadofx:1.7.16'
 
-    compile project(":kplot-common")
+    expectedBy project(":kplot-common")
 
-    testCompile "junit:junit:4.12"
     testCompile "org.jetbrains.kotlin:kotlin-test"
     testCompile "org.jetbrains.kotlin:kotlin-test-junit"
+
+    testImplementation(
+            'org.junit.jupiter:junit-jupiter-api:5.1.0'
+    )
+    testRuntimeOnly(
+            'org.junit.jupiter:junit-jupiter-engine:5.1.0'
+    )
 }
 
 compileKotlin {
@@ -26,6 +33,10 @@ compileKotlin {
 }
 compileTestKotlin {
     kotlinOptions.jvmTarget = "1.8"
+}
+
+test {
+    useJUnitPlatform()
 }
 
 sourceCompatibility = "1.8"

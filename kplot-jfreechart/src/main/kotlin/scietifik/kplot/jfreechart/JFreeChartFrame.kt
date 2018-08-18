@@ -1,25 +1,41 @@
 package scietifik.kplot.jfreechart
 
 import javafx.application.Platform.runLater
+import javafx.scene.Parent
 import org.jfree.chart.JFreeChart
+import org.jfree.chart.axis.DateAxis
+import org.jfree.chart.axis.LogarithmicAxis
 import org.jfree.chart.axis.NumberAxis
+import org.jfree.chart.axis.ValueAxis
+import org.jfree.chart.fx.ChartViewer
 import org.jfree.chart.plot.XYPlot
 import org.jfree.chart.renderer.xy.XYErrorRenderer
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer
 import org.jfree.chart.renderer.xy.XYSplineRenderer
 import org.jfree.chart.renderer.xy.XYStepRenderer
-import scientifik.kplot.common.*
+import org.jfree.chart.title.LegendTitle
+import org.jfree.chart.title.TextTitle
+import scientifik.kplot.common.Plot
+import scientifik.kplot.common.PlotFrame
+import scientifik.kplot.common.config.*
+import tornadofx.*
 import java.awt.BasicStroke
 import java.awt.Color
 import java.awt.Shape
-import java.util.stream.Collectors
+import java.util.*
 import kotlin.math.absoluteValue
 
-class JFreeChartFrame : PlotFrame {
+class JFreeChartFrame(title: String? = null, config: Config? = null) : Fragment(title), PlotFrame {
 
     private val xyPlot: XYPlot = XYPlot(null, NumberAxis(), NumberAxis(), XYLineAndShapeRenderer())
     private val chart: JFreeChart = JFreeChart(xyPlot)
 
+    override val root: Parent = borderpane {
+        center = ChartViewer(chart)
+    }
+
+
+    // color and shape cache
     private val colorCache = HashMap<String, Color>()
     private val shapeCache = HashMap<String, Shape>()
 
@@ -28,14 +44,18 @@ class JFreeChartFrame : PlotFrame {
      */
     private val index = HashMap<String, Int>()
 
-    override var layout: Layout = JFreeChartLayout()
-        set(value) {
-            field = value
+    //TODO store x and y ranges
+
+    private val meta = (config ?: ConfigMap()).apply {
+        onChange { _, _ ->
+            //TODO differentiate parameters?
             updateFrame()
-            value.onChange { _, _ ->
-                updateFrame()
-            }
         }
+    }
+
+    override val layout: FrameConfig = FrameConfig(meta).apply {
+        this.title = title
+    }
 
     override fun get(key: String): JFreeChartPlot? {
         return index[key]?.let { xyPlot.getDataset(it) } as JFreeChartPlot?
@@ -62,24 +82,113 @@ class JFreeChartFrame : PlotFrame {
 
     override fun configure(key: String, config: Config) {
         get(key)?.let {
-            it.configure(config)
+            it.config.update(config)
             render(key)
         }
     }
 
-//    override fun append(key: String, data: PlotData) {
-//        get(key)?.let{
-//            it.append(data)
-//            xyPlot.datasetChanged(DatasetChangeEvent(this.xyPlot, it))
-//        }
-//    }
+    private fun buildAxis(meta: AxisConfig): ValueAxis {
+        val axis = when (meta.type) {
+            AxisConfig.AxisType.LOG -> LogarithmicAxis("").apply {
+                //        logAxis.setMinorTickCount(10);
+                expTickLabelsFlag = true
+                isMinorTickMarksVisible = true
+                allowNegativesFlag = false
+                autoRangeNextLogFlag = true
+                strictValuesFlag = false // Omit negatives but do not throw exception
+            }
+            AxisConfig.AxisType.TIME -> DateAxis().apply {
+                timeZone = TimeZone.getTimeZone(meta["timeZone"].string ?: "UTC")
+            }
+            AxisConfig.AxisType.CATEGORY -> throw IllegalArgumentException("Category asis type not supported by JFreeChartFrame")
+            else -> NumberAxis().apply {
+                autoRangeIncludesZero = meta["includeZero"].boolean ?: false
+                autoRangeStickyZero = meta["stickyZero"].boolean ?: false
+            }
+        }
 
+        meta.range.from.number?.toDouble()?.let {
+            if (it.isFinite()) {
+                axis.lowerBound = it
+            }
+        }
+
+        meta.range.to.number?.toDouble()?.let {
+            if (it.isFinite()) {
+                axis.upperBound = it
+            }
+        }
+
+        axis.label = meta.title?.let {
+            it + (meta.units?.let { units -> " ($units)" } ?: "")
+        } ?: ""
+
+        return axis
+    }
+
+    private fun updateXAxis() {
+        val axis = buildAxis(layout.getAxis(Plot.X_AXIS))
+        /*
+                    "x" -> {
+                xyPlot.domainAxis = axis
+                when (crosshair) {
+                    "free" -> {
+                        xyPlot.isDomainCrosshairVisible = true
+                        xyPlot.isDomainCrosshairLockedOnData = false
+                    }
+                    "data" -> {
+                        xyPlot.isDomainCrosshairVisible = true
+                        xyPlot.isDomainCrosshairLockedOnData = true
+                    }
+                    "none" -> xyPlot.isDomainCrosshairVisible = false
+                }
+            }
+         */
+        xyPlot.domainAxis = axis
+    }
+
+    private fun updateYAxis() {
+        val axis = buildAxis(layout.getAxis(Plot.Y_AXIS))
+        /*
+                    "x" -> {
+                xyPlot.domainAxis = axis
+                when (crosshair) {
+                    "free" -> {
+                        xyPlot.isDomainCrosshairVisible = true
+                        xyPlot.isDomainCrosshairLockedOnData = false
+                    }
+                    "data" -> {
+                        xyPlot.isDomainCrosshairVisible = true
+                        xyPlot.isDomainCrosshairLockedOnData = true
+                    }
+                    "none" -> xyPlot.isDomainCrosshairVisible = false
+                }
+            }
+         */
+        xyPlot.rangeAxis = axis
+    }
+
+    private fun updateLegend() {
+        if (layout.legend.visible) {
+            if (chart.legend == null) {
+                chart.addLegend(LegendTitle(xyPlot))
+            }
+        } else {
+            chart.removeLegend()
+        }
+        //this.xyPlot.legendItems
+    }
 
     /**
      * Update frame configuration based on layout
      */
     private fun updateFrame() {
-
+        runLater {
+            this.chart.title = TextTitle(layout.title ?: "")
+            updateLegend()
+            updateXAxis()
+            updateYAxis()
+        }
     }
 
     /**
@@ -104,30 +213,36 @@ class JFreeChartFrame : PlotFrame {
     }
 
     private fun JFreeChartPlot.createRenderer(key: String): XYLineAndShapeRenderer {
-        val render: XYLineAndShapeRenderer = if (showErrors) {
+        val render: XYLineAndShapeRenderer = if (config.showErrors) {
             XYErrorRenderer()
         } else {
-            when (connectionType) {
-                JFreeChartPlot.ConnectionType.STEP -> XYStepRenderer()
-                JFreeChartPlot.ConnectionType.SPLINE -> XYSplineRenderer()
+            when (config.connectionType) {
+                XYPlotConfig.ConnectionType.STEP -> XYStepRenderer()
+                XYPlotConfig.ConnectionType.SPLINE -> XYSplineRenderer()
                 else -> XYLineAndShapeRenderer()
             }
         }
 
-        render.defaultShapesVisible = showSymbols
-        render.defaultLinesVisible = showLines
+        render.defaultShapesVisible = config.showSymbols
+        render.defaultLinesVisible = config.showLines
 
         //Build Legend map to avoid serialization issues
-        render.setSeriesStroke(0, BasicStroke(thickness.toFloat()))
+        render.setSeriesStroke(0, BasicStroke(config.thickness.toFloat()))
 
         (awtColor ?: colorCache[key])?.let { render.setSeriesPaint(0, it) }
 
         shapeCache[key]?.let { render.setSeriesShape(0, it) }
 
-        render.setSeriesVisible(0, visible)
+        render.setSeriesVisible(0, config.visible)
 
-        render.setLegendItemLabelGenerator { dataset, series -> title ?: dataset.getSeriesKey(series).toString() }
+        render.setLegendItemLabelGenerator { dataset, series ->
+            config.title ?: dataset.getSeriesKey(series).toString()
+        }
 
         return render
     }
 }
+//
+//fun JFreeChartFrame.configure(action: JFreeChartConfig.() -> Unit) {
+//    JFreeChartConfig(this.layout).apply(action)
+//}

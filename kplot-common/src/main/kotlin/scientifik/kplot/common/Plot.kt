@@ -1,5 +1,9 @@
 package scientifik.kplot.common
 
+import scientifik.kplot.common.config.Config
+import scientifik.kplot.common.config.FrameConfig
+import scientifik.kplot.common.config.Value
+
 
 /**
  * Generic scatter plot data. Data is organized in axis. Each axis consists a list of values of the same length.
@@ -25,6 +29,67 @@ interface PlotData {
      * The number of values in each of axis set
      */
     val size: Int
+}
+
+/**
+ * Notifies about data change
+ */
+typealias DataChangeListener = PlotData.(Int) -> Unit
+
+/**
+ * A mutable [PlotData] with attachable listeners
+ */
+interface MutablePlotData : PlotData {
+
+    fun append(map: Map<String, Value>)
+    /**
+     * Append data to the end of data list. Missing values are replaced by nulls
+     */
+    fun append(vararg pairs: Pair<String, Value>){
+        append(mapOf(*pairs))
+    }
+
+    /**
+     * Replace data at index with given entry. Missing values are replaced by nulls
+     */
+    fun replace(index: Int, vararg pairs: Pair<String, Value>)
+
+    /**
+     * Remove entry at index and decrease index of subsequent entries
+     */
+    fun remove(index: Int)
+
+    /**
+     * Add change listener
+     */
+    fun onChange(listener: DataChangeListener)
+
+    /**
+     * Remove change listener
+     */
+    fun removeListener(listener: DataChangeListener)
+}
+
+/**
+ * Extension property corresponding to x axis
+ */
+val PlotData.x: List<Value>
+    get() = this[Plot.X_AXIS]
+
+val PlotData.y: List<Value>
+    get() = this[Plot.Y_AXIS]
+
+val PlotData.z: List<Value>
+    get() = this[Plot.Z_AXIS]
+
+
+/**
+ * A single displayed entity.
+ */
+interface Plot {
+    val data: PlotData
+    //val type: String
+    val config: Config
 
     companion object {
         const val X_AXIS = "x"
@@ -34,36 +99,13 @@ interface PlotData {
 }
 
 /**
- * Extension property corresponding to x axis
- */
-val PlotData.x: List<Value>
-    get() = this[PlotData.X_AXIS]
-
-val PlotData.y: List<Value>
-    get() = this[PlotData.Y_AXIS]
-
-val PlotData.z: List<Value>
-    get() = this[PlotData.Z_AXIS]
-
-
-/**
- * A single displayed entity.
- */
-interface Plot : Config {
-    val data: PlotData
-    val type: String
-
-    fun configure(config: Config)
-}
-
-/**
  * A frame containing single or multiple plots
  */
 interface PlotFrame {
     /**
      * A configuration for the plot
      */
-    var layout: Layout
+    val layout: FrameConfig
 
     /**
      * Get existing plot or return null is it is not present
