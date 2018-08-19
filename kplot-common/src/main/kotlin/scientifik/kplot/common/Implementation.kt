@@ -1,7 +1,7 @@
 package scientifik.kplot.common
 
-import scientifik.kplot.common.config.Config
-import scientifik.kplot.common.config.ConfigMap
+import scientifik.kplot.common.config.Configuration
+import scientifik.kplot.common.config.ConfigurationMap
 import scientifik.kplot.common.config.Value
 
 /**
@@ -74,10 +74,10 @@ class SimplePlotDataBuilder(override val axes: List<String>) : MutablePlotData {
 /**
  * Simple implementation of [Plot]
  */
-class SimplePlot(override val data: PlotData, override val config: Config) : Plot
+class SimplePlot(override val data: PlotData, override val meta: Configuration) : Plot
 
 fun MutablePlotData.appendXY(x: Value, y:Value) = append(Plot.X_AXIS to x, Plot.Y_AXIS to y)
 
-fun xyPlot(config: Config = ConfigMap(), builder: MutablePlotData.() -> Unit): SimplePlot {
-    return SimplePlot(SimplePlotDataBuilder(listOf(Plot.X_AXIS, Plot.Y_AXIS)).apply(builder), config)
+fun xyPlot(meta: Configuration = ConfigurationMap(), builder: MutablePlotData.() -> Unit): SimplePlot {
+    return SimplePlot(SimplePlotDataBuilder(listOf(Plot.X_AXIS, Plot.Y_AXIS)).apply(builder), meta)
 }

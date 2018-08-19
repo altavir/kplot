@@ -1,7 +1,8 @@
 package scientifik.kplot.common
 
-import scientifik.kplot.common.config.Config
-import scientifik.kplot.common.config.FrameConfig
+import scientifik.kplot.common.config.Configurable
+import scientifik.kplot.common.config.Configuration
+import scientifik.kplot.common.config.FrameConfiguration
 import scientifik.kplot.common.config.Value
 
 
@@ -45,7 +46,7 @@ interface MutablePlotData : PlotData {
     /**
      * Append data to the end of data list. Missing values are replaced by nulls
      */
-    fun append(vararg pairs: Pair<String, Value>){
+    fun append(vararg pairs: Pair<String, Value>) {
         append(mapOf(*pairs))
     }
 
@@ -86,10 +87,9 @@ val PlotData.z: List<Value>
 /**
  * A single displayed entity.
  */
-interface Plot {
+interface Plot : Configurable {
     val data: PlotData
     //val type: String
-    val config: Config
 
     companion object {
         const val X_AXIS = "x"
@@ -101,11 +101,12 @@ interface Plot {
 /**
  * A frame containing single or multiple plots
  */
-interface PlotFrame {
+interface PlotFrame : Configurable {
     /**
      * A configuration for the plot
      */
-    val layout: FrameConfig
+    val layout: FrameConfiguration
+        get() = FrameConfiguration(meta)
 
     /**
      * Get existing plot or return null is it is not present
@@ -126,7 +127,7 @@ interface PlotFrame {
      * Apply configuration to plot each plot with name starting with [key]. Meaning that if there are plots with keys
      * `a.b.c` and `a.b.d` and key is `a.b`, both plots will bi updated
      */
-    fun configure(key: String, config: Config)
+    fun configure(key: String, meta: Configuration)
 
 //    /**
 //     * Append data to given plot. Not all plots allow this operation and [data] shape (axes names) must be compatible

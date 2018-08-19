@@ -7,9 +7,11 @@ import kotlin.jvm.JvmName
 typealias PropertyChangeListener = (key: String, value: Value) -> Unit
 
 /**
- * The container for custom properties
+ * The container for custom properties. Lightweight variant of DataForge Meta
+ *
+ * TODO separate DataForge Meta definition in a separate artifact and use it here
  */
-interface Config {
+interface Configuration {
 
     /**
      * Get property for given key
@@ -48,13 +50,13 @@ interface Config {
     /**
      * Add the whole node to configuration
      */
-    infix fun String.to(config: Config)
+    infix fun String.to(meta: Configuration)
 
     /**
      * Type safe builder method to add property node
      */
-    infix fun String.to(action: Config.() -> Unit){
-        this to ConfigMap().apply(action)
+    infix fun String.to(action: Configuration.() -> Unit){
+        this to ConfigurationMap().apply(action)
     }
 
     companion object {
@@ -81,7 +83,7 @@ interface Config {
     }
 }
 
-fun Config.update(other: Config) {
+fun Configuration.update(other: Configuration) {
     other.keys.forEach { key ->
         this[key] = other[key]
     }
@@ -90,7 +92,7 @@ fun Config.update(other: Config) {
 /**
  * A decorator config node that delegates everything to parent
  */
-class ChildConfig(private val parent: Config, private val path: String) : Config {
+class ChildConfiguration(private val parent: Configuration, private val path: String) : Configuration {
     override fun get(key: String): Value = parent["$path.$key"]
 
     override fun set(key: String, value: Value) {
@@ -110,15 +112,15 @@ class ChildConfig(private val parent: Config, private val path: String) : Config
 
     override fun invalidate(key: String) = parent.invalidate("$path.$key")
 
-    override fun String.to(config: Config) = with(parent) { "$path.${this@to}" to config }
+    override fun String.to(meta: Configuration) = with(parent) { "$path.${this@to}" to meta }
 }
 
-fun Config.getChild(path: String) = ChildConfig(this, path)
+fun Configuration.getChild(path: String) = ChildConfiguration(this, path)
 
 /**
  * Basic implementation for a property holder
  */
-class ConfigMap(private val map: MutableMap<String, Value> = HashMap()) : Config {
+class ConfigurationMap(private val map: MutableMap<String, Value> = HashMap()) : Configuration {
     private val listeners: MutableSet<PropertyChangeListener> = HashSet()
 
     override val keys: Collection<String> = map.keys
@@ -128,7 +130,7 @@ class ConfigMap(private val map: MutableMap<String, Value> = HashMap()) : Config
      * the search is delegated to the entry found by the first token separated by `.`. The use of `.` in names should be avoided
      */
     override fun get(key: String): Value = map[key] ?: run {
-        (map[key.substringBefore(".")] as? ConfigMap)?.get(key.substringAfter("."))
+        (map[key.substringBefore(".")] as? ConfigurationMap)?.get(key.substringAfter("."))
     }
 
     /**
@@ -145,11 +147,11 @@ class ConfigMap(private val map: MutableMap<String, Value> = HashMap()) : Config
         invalidate(key)
     }
 
-    override fun String.to(config: Config) {
-        config.onChange { key, _ ->
+    override fun String.to(meta: Configuration) {
+        meta.onChange { key, _ ->
             invalidate("${this}.$key")
         }
-        set(this, config)
+        set(this, meta)
     }
 
     override fun onChange(listener: PropertyChangeListener) {

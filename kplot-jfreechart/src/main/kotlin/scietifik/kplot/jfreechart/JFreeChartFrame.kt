@@ -25,7 +25,7 @@ import java.awt.Shape
 import java.util.*
 import kotlin.math.absoluteValue
 
-class JFreeChartFrame(title: String? = null, config: Config? = null) : Fragment(title), PlotFrame {
+class JFreeChartFrame(title: String? = null, meta: Configuration? = null) : Fragment(title), PlotFrame {
 
     private val xyPlot: XYPlot = XYPlot(null, NumberAxis(), NumberAxis(), XYLineAndShapeRenderer())
     private val chart: JFreeChart = JFreeChart(xyPlot)
@@ -46,14 +46,14 @@ class JFreeChartFrame(title: String? = null, config: Config? = null) : Fragment(
 
     //TODO store x and y ranges
 
-    private val meta = (config ?: ConfigMap()).apply {
+    override val meta = (meta ?: ConfigurationMap()).apply {
         onChange { _, _ ->
             //TODO differentiate parameters?
             updateFrame()
         }
     }
 
-    override val layout: FrameConfig = FrameConfig(meta).apply {
+    override val layout: FrameConfiguration = FrameConfiguration(this.meta).apply {
         this.title = title
     }
 
@@ -81,16 +81,16 @@ class JFreeChartFrame(title: String? = null, config: Config? = null) : Fragment(
         }
     }
 
-    override fun configure(key: String, config: Config) {
+    override fun configure(key: String, meta: Configuration) {
         get(key)?.let {
-            it.config.update(config)
+            it.meta.update(meta)
             render(key)
         }
     }
 
-    private fun buildAxis(meta: AxisConfig): ValueAxis {
+    private fun buildAxis(meta: AxisConfiguration): ValueAxis {
         val axis = when (meta.type) {
-            AxisConfig.AxisType.LOG -> LogarithmicAxis("").apply {
+            AxisConfiguration.AxisType.LOG -> LogarithmicAxis("").apply {
                 //        logAxis.setMinorTickCount(10);
                 expTickLabelsFlag = true
                 isMinorTickMarksVisible = true
@@ -98,10 +98,10 @@ class JFreeChartFrame(title: String? = null, config: Config? = null) : Fragment(
                 autoRangeNextLogFlag = true
                 strictValuesFlag = false // Omit negatives but do not throw exception
             }
-            AxisConfig.AxisType.TIME -> DateAxis().apply {
+            AxisConfiguration.AxisType.TIME -> DateAxis().apply {
                 timeZone = TimeZone.getTimeZone(meta["timeZone"].string ?: "UTC")
             }
-            AxisConfig.AxisType.CATEGORY -> throw IllegalArgumentException("Category asis type not supported by JFreeChartFrame")
+            AxisConfiguration.AxisType.CATEGORY -> throw IllegalArgumentException("Category asis type not supported by JFreeChartFrame")
             else -> NumberAxis().apply {
                 autoRangeIncludesZero = meta["includeZero"].boolean ?: false
                 autoRangeStickyZero = meta["stickyZero"].boolean ?: false
@@ -214,30 +214,30 @@ class JFreeChartFrame(title: String? = null, config: Config? = null) : Fragment(
     }
 
     private fun JFreeChartPlot.createRenderer(key: String): XYLineAndShapeRenderer {
-        val render: XYLineAndShapeRenderer = if (config.showErrors) {
+        val render: XYLineAndShapeRenderer = if (meta.showErrors) {
             XYErrorRenderer()
         } else {
-            when (config.connectionType) {
-                XYPlotConfig.ConnectionType.STEP -> XYStepRenderer()
-                XYPlotConfig.ConnectionType.SPLINE -> XYSplineRenderer()
+            when (meta.connectionType) {
+                XYPlotConfiguration.ConnectionType.STEP -> XYStepRenderer()
+                XYPlotConfiguration.ConnectionType.SPLINE -> XYSplineRenderer()
                 else -> XYLineAndShapeRenderer()
             }
         }
 
-        render.defaultShapesVisible = config.showSymbols
-        render.defaultLinesVisible = config.showLines
+        render.defaultShapesVisible = meta.showSymbols
+        render.defaultLinesVisible = meta.showLines
 
         //Build Legend map to avoid serialization issues
-        render.setSeriesStroke(0, BasicStroke(config.thickness.toFloat()))
+        render.setSeriesStroke(0, BasicStroke(meta.thickness.toFloat()))
 
         (awtColor ?: colorCache[key])?.let { render.setSeriesPaint(0, it) }
 
         shapeCache[key]?.let { render.setSeriesShape(0, it) }
 
-        render.setSeriesVisible(0, config.visible)
+        render.setSeriesVisible(0, meta.visible)
 
         render.setLegendItemLabelGenerator { dataset, series ->
-            config.title ?: dataset.getSeriesKey(series).toString()
+            meta.title ?: dataset.getSeriesKey(series).toString()
         }
 
         return render
