@@ -5,6 +5,7 @@ plugins {
 description = "JVM examples"
 
 repositories {
+    maven { url 'https://jitpack.io' }
     mavenCentral()
 }
 
@@ -19,6 +20,7 @@ dependencies {
     testRuntimeOnly(
             'org.junit.jupiter:junit-jupiter-engine:5.2.0'
     )
+    implementation 'com.github.altavir.kmath:kmath-jvm:dev-SNAPSHOT'
 }
 
 compileKotlin {
@@ -39,3 +41,4 @@ task jfreechart(type: JavaExec){
     classpath = sourceSets.main.runtimeClasspath
     main = 'scientifik.kplot.examples.JFreeChartFrameTestKt'
 }
+

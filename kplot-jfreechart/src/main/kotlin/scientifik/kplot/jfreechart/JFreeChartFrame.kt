@@ -1,4 +1,4 @@
-package scietifik.kplot.jfreechart
+package scientifik.kplot.jfreechart
 
 import javafx.application.Platform.runLater
 import javafx.scene.Parent
@@ -15,6 +15,7 @@ import org.jfree.chart.renderer.xy.XYSplineRenderer
 import org.jfree.chart.renderer.xy.XYStepRenderer
 import org.jfree.chart.title.LegendTitle
 import org.jfree.chart.title.TextTitle
+import scientifik.kplot.common.ConfigurationMap
 import scientifik.kplot.common.Plot
 import scientifik.kplot.common.PlotFrame
 import scientifik.kplot.common.config.*
@@ -46,7 +47,7 @@ class JFreeChartFrame(title: String? = null, meta: Configuration? = null) : Frag
 
     //TODO store x and y ranges
 
-    override val meta = (meta ?: ConfigurationMap()).apply {
+    override val meta = (meta ?: ConfigurationMap()).asStyleable().apply {
         onChange { _, _ ->
             //TODO differentiate parameters?
             updateFrame()
@@ -214,30 +215,30 @@ class JFreeChartFrame(title: String? = null, meta: Configuration? = null) : Frag
     }
 
     private fun JFreeChartPlot.createRenderer(key: String): XYLineAndShapeRenderer {
-        val render: XYLineAndShapeRenderer = if (meta.showErrors) {
+        val render: XYLineAndShapeRenderer = if (xyMeta.showErrors) {
             XYErrorRenderer()
         } else {
-            when (meta.connectionType) {
+            when (xyMeta.connectionType) {
                 XYPlotConfiguration.ConnectionType.STEP -> XYStepRenderer()
                 XYPlotConfiguration.ConnectionType.SPLINE -> XYSplineRenderer()
                 else -> XYLineAndShapeRenderer()
             }
         }
 
-        render.defaultShapesVisible = meta.showSymbols
-        render.defaultLinesVisible = meta.showLines
+        render.defaultShapesVisible = xyMeta.showSymbols
+        render.defaultLinesVisible = xyMeta.showLines
 
         //Build Legend map to avoid serialization issues
-        render.setSeriesStroke(0, BasicStroke(meta.thickness.toFloat()))
+        render.setSeriesStroke(0, BasicStroke(xyMeta.thickness.toFloat()))
 
         (awtColor ?: colorCache[key])?.let { render.setSeriesPaint(0, it) }
 
         shapeCache[key]?.let { render.setSeriesShape(0, it) }
 
-        render.setSeriesVisible(0, meta.visible)
+        render.setSeriesVisible(0, xyMeta.visible)
 
         render.setLegendItemLabelGenerator { dataset, series ->
-            meta.title ?: dataset.getSeriesKey(series).toString()
+            xyMeta.title ?: dataset.getSeriesKey(series).toString()
         }
 
         return render
