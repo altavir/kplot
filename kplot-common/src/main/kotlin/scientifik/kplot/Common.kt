@@ -1,7 +1,6 @@
-package scientifik.kplot.common
+package scientifik.kplot
 
-import kotlinx.serialization.Serializable
-import scientifik.kplot.common.config.*
+import scientifik.kplot.config.*
 
 /**
  * Simple multiplatform implementations for [Configuration], [Plot] and [PlotData]
@@ -62,7 +61,6 @@ class ConfigurationMap(private val map: MutableMap<String, Value> = HashMap()) :
 /**
  * Simple implementation of [PlotData]
  */
-@Serializable
 class SimplePlotData(private val data: Map<String, List<Value>>) : PlotData {
 
     override val size: Int = data.values.map { it.size }.distinct().apply {
@@ -80,7 +78,6 @@ class SimplePlotData(private val data: Map<String, List<Value>>) : PlotData {
 /**
  * A builder for simple data
  */
-@Serializable
 class SimplePlotDataBuilder(override val axes: List<String>) : MutablePlotData {
 
     private val data = axes.associate { it to ArrayList<Value>() }
@@ -127,7 +124,7 @@ class SimplePlotDataBuilder(override val axes: List<String>) : MutablePlotData {
 /**
  * Simple implementation of [Plot]
  */
-class SimplePlot(override val data: PlotData, meta: Configuration) : Plot{
+class SimplePlot(override val data: PlotData, meta: Configuration) : Plot {
     override val meta: StyledConfiguration = meta.asStyleable()
 }
 

@@ -1,12 +1,26 @@
-package scientifik.kplot.common.config
+package scientifik.kplot.config
 
-import scientifik.kplot.common.ConfigurationMap
+import scientifik.kplot.ConfigurationMap
 
 /**
  * Specification allows to apply custom configuration in a type safe way to simple untyped configuration
  */
-interface Specification<T> {
-    fun update(meta: Configuration, action: T.() -> Unit)
+interface Specification<T : Configuration> {
+    /**
+     * Update given configuration using given type as a builder
+     */
+    fun update(config: Configuration, action: T.() -> Unit) {
+        wrap(config).apply(action)
+    }
+
+    /**
+     * Wrap generic configuration producing instance of desired type
+     */
+    fun wrap(config: Configuration): T
+}
+
+fun <T : Configuration> specification(wrapper: (Configuration) -> T): Specification<T> = object : Specification<T> {
+    override fun wrap(config: Configuration): T  = wrapper(config)
 }
 
 /**
@@ -57,4 +71,4 @@ var Styleable.style: Meta
         this.meta.style = value
     }
 
-fun <T:Styleable> T.style(style: Meta) = apply { this.style = style }
+fun <T : Styleable> T.style(style: Meta) = apply { this.style = style }

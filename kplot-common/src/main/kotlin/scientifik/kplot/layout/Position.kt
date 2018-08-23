@@ -1,4 +1,4 @@
-package scientifik.kplot.common.layout
+package scientifik.kplot.layout
 
 import kotlin.properties.Delegates
 

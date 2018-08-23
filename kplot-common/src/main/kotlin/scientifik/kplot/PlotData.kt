@@ -1,6 +1,6 @@
-package scientifik.kplot.common
+package scientifik.kplot
 
-import scientifik.kplot.common.config.Value
+import scientifik.kplot.config.Value
 
 /**
  * Generic scatter plot data. Data is organized in axis. Each axis consists a list of values of the same length.

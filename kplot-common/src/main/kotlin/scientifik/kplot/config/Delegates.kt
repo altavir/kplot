@@ -1,7 +1,8 @@
-package scientifik.kplot.common
+package scientifik.kplot.config
 
-import scientifik.kplot.common.config.*
+import kotlin.jvm.JvmName
 import kotlin.properties.ReadWriteProperty
+import kotlin.reflect.KClass
 import kotlin.reflect.KProperty
 
 class ConfigDelegate(private val key: String? = null, private val default: Value = null) : ReadWriteProperty<Configuration, Value> {
@@ -75,3 +76,57 @@ class SafeNumberConfigDelegate(private val key: String? = null, private val defa
         thisRef[key ?: property.name] = value
     }
 }
+
+/**
+ * A patch to work around verification error in JVM
+ */
+internal expect fun <E : Enum<E>> strToEnum(type: KClass<out E>, name: String): E
+
+class SafeEnumvConfigDelegate<E : Enum<E>>(private val key: String? = null, private val default: E) : ReadWriteProperty<Configuration, E> {
+    override fun getValue(thisRef: Configuration, property: KProperty<*>): E {
+        return (thisRef[key ?: property.name].string)?.let { strToEnum<E>(default::class, it) } ?: default
+    }
+
+    override fun setValue(thisRef: Configuration, property: KProperty<*>, value: E) {
+        thisRef[key ?: property.name] = value.name
+    }
+}
+
+//Child node delegate
+
+class ChildConfigDelegate<T : Configuration>(private val key: String? = null, private val converter: (Configuration) -> T) : ReadWriteProperty<Configuration, T> {
+    override fun getValue(thisRef: Configuration, property: KProperty<*>): T {
+        return converter(thisRef.child(key ?: property.name))
+    }
+
+    override fun setValue(thisRef: Configuration, property: KProperty<*>, value: T) {
+        thisRef[key ?: property.name] = value
+    }
+
+}
+
+/**
+ * A property delegate that uses custom key
+ */
+fun Configuration.value(key: String? = null, default: Value = null) = ConfigDelegate(key, default)
+
+fun Configuration.string(key: String? = null, default: String? = null) = StringConfigDelegate(key, default)
+
+fun Configuration.boolean(key: String? = null, default: Boolean? = null) = BooleanConfigDelegate(key, default)
+
+fun Configuration.number(key: String? = null, default: Number? = null) = NumberConfigDelegate(key, default)
+
+fun <T : Configuration> Configuration.child(key: String? = null, converter: (Configuration) -> T) = ChildConfigDelegate<T>(key, converter)
+
+fun <T : Configuration> Configuration.spec(spec: Specification<T>, key: String? = null) = ChildConfigDelegate<T>(key) { spec.wrap(this) }
+
+@JvmName("safeString")
+fun Configuration.string(key: String? = null, default: String) = SafeStringConfigDelegate(key, default)
+
+@JvmName("safeBoolean")
+fun Configuration.boolean(key: String? = null, default: Boolean) = SafeBooleanConfigDelegate(key, default)
+
+@JvmName("safeNumber")
+fun Configuration.number(key: String? = null, default: Number) = SafeNumberConfigDelegate(key, default)
+
+fun <E : Enum<E>> Configuration.enum(default: E, key: String? = null) = SafeEnumvConfigDelegate(key, default)

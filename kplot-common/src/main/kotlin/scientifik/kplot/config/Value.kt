@@ -1,4 +1,4 @@
-package scientifik.kplot.common.config
+package scientifik.kplot.config
 
 /**
  * A temporary plug for plot value. Values could be null

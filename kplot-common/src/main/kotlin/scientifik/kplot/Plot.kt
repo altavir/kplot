@@ -1,8 +1,8 @@
-package scientifik.kplot.common
+package scientifik.kplot
 
-import scientifik.kplot.common.config.Configuration
-import scientifik.kplot.common.config.FrameConfiguration
-import scientifik.kplot.common.config.Styleable
+import scientifik.kplot.config.Configuration
+import scientifik.kplot.config.Styleable
+import scientifik.kplot.specifications.GenericFrameSpecification
 
 /**
  * A single displayed entity.
@@ -25,8 +25,8 @@ interface PlotFrame : Styleable {
     /**
      * A configuration for the plot
      */
-    val layout: FrameConfiguration
-        get() = FrameConfiguration(meta)
+    val layout: GenericFrameSpecification
+        get() = GenericFrameSpecification(meta)
 
     /**
      * Get existing plot or return null is it is not present

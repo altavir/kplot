@@ -1,11 +1,11 @@
 package scientifik.kplot.jfreechart
 
 import org.jfree.data.xy.AbstractXYDataset
-import scientifik.kplot.common.Plot
-import scientifik.kplot.common.config.XYPlotConfiguration
-import scientifik.kplot.common.config.number
-import scientifik.kplot.common.x
-import scientifik.kplot.common.y
+import scientifik.kplot.Plot
+import scientifik.kplot.config.number
+import scientifik.kplot.specifications.XYPlotConfiguration
+import scientifik.kplot.x
+import scientifik.kplot.y
 import java.awt.Color
 
 class JFreeChartPlot(val plot: Plot) : AbstractXYDataset(), Plot by plot {

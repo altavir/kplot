@@ -1,6 +1,6 @@
 plugins {
     id 'kotlin-platform-common'
-    id 'kotlinx-serialization'
+//    id 'kotlinx-serialization'
 }
 
 group 'hep.dataforge'
@@ -12,7 +12,8 @@ repositories {
 
 dependencies {
     implementation  "org.jetbrains.kotlin:kotlin-stdlib-common:$kotlin_version"
-    implementation  "org.jetbrains.kotlinx:kotlinx-serialization-runtime:$serialization_version"
+    //implementation  "org.jetbrains.kotlinx:kotlinx-serialization-runtime:$serialization_version"
+
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core-common:0.24.0'
     testCompile "org.jetbrains.kotlin:kotlin-test-annotations-common"
     testCompile "org.jetbrains.kotlin:kotlin-test-common"

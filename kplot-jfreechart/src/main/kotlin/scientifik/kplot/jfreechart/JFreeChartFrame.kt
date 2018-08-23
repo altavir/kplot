@@ -15,10 +15,13 @@ import org.jfree.chart.renderer.xy.XYSplineRenderer
 import org.jfree.chart.renderer.xy.XYStepRenderer
 import org.jfree.chart.title.LegendTitle
 import org.jfree.chart.title.TextTitle
-import scientifik.kplot.common.ConfigurationMap
-import scientifik.kplot.common.Plot
-import scientifik.kplot.common.PlotFrame
-import scientifik.kplot.common.config.*
+import scientifik.kplot.ConfigurationMap
+import scientifik.kplot.Plot
+import scientifik.kplot.PlotFrame
+import scientifik.kplot.config.*
+import scientifik.kplot.specifications.GenericAxisSpecification
+import scientifik.kplot.specifications.GenericFrameSpecification
+import scientifik.kplot.specifications.XYPlotConfiguration
 import tornadofx.*
 import java.awt.BasicStroke
 import java.awt.Color
@@ -54,7 +57,7 @@ class JFreeChartFrame(title: String? = null, meta: Configuration? = null) : Frag
         }
     }
 
-    override val layout: FrameConfiguration = FrameConfiguration(this.meta).apply {
+    override val layout: GenericFrameSpecification = GenericFrameSpecification(this.meta).apply {
         this.title = title
     }
 
@@ -89,9 +92,9 @@ class JFreeChartFrame(title: String? = null, meta: Configuration? = null) : Frag
         }
     }
 
-    private fun buildAxis(meta: AxisConfiguration): ValueAxis {
+    private fun buildAxis(meta: GenericAxisSpecification): ValueAxis {
         val axis = when (meta.type) {
-            AxisConfiguration.AxisType.LOG -> LogarithmicAxis("").apply {
+            GenericAxisSpecification.AxisType.LOG -> LogarithmicAxis("").apply {
                 //        logAxis.setMinorTickCount(10);
                 expTickLabelsFlag = true
                 isMinorTickMarksVisible = true
@@ -99,10 +102,10 @@ class JFreeChartFrame(title: String? = null, meta: Configuration? = null) : Frag
                 autoRangeNextLogFlag = true
                 strictValuesFlag = false // Omit negatives but do not throw exception
             }
-            AxisConfiguration.AxisType.TIME -> DateAxis().apply {
+            GenericAxisSpecification.AxisType.TIME -> DateAxis().apply {
                 timeZone = TimeZone.getTimeZone(meta["timeZone"].string ?: "UTC")
             }
-            AxisConfiguration.AxisType.CATEGORY -> throw IllegalArgumentException("Category asis type not supported by JFreeChartFrame")
+            GenericAxisSpecification.AxisType.CATEGORY -> throw IllegalArgumentException("Category asis type not supported by JFreeChartFrame")
             else -> NumberAxis().apply {
                 autoRangeIncludesZero = meta["includeZero"].boolean ?: false
                 autoRangeStickyZero = meta["stickyZero"].boolean ?: false

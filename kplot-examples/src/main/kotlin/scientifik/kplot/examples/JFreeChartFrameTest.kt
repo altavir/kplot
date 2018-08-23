@@ -2,10 +2,14 @@ package scientifik.kplot.examples
 
 import javafx.application.Application
 import javafx.scene.Parent
-import scientifik.kplot.common.appendXY
-import scientifik.kplot.common.config.*
-import scientifik.kplot.common.xyPlot
+import scientifik.kplot.appendXY
+import scientifik.kplot.config.configure
+import scientifik.kplot.config.createStyle
+import scientifik.kplot.config.style
 import scientifik.kplot.jfreechart.JFreeChartFrame
+import scientifik.kplot.specifications.XYPlot
+import scientifik.kplot.specifications.XYPlotConfiguration
+import scientifik.kplot.xyPlot
 import tornadofx.*
 
 class JFreeChartFrameTest : App(TestView::class)

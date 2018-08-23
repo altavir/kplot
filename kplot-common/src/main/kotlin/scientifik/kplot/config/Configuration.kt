@@ -1,7 +1,4 @@
-package scientifik.kplot.common.config
-
-import scientifik.kplot.common.*
-import kotlin.jvm.JvmName
+package scientifik.kplot.config
 
 
 /**
@@ -9,27 +6,12 @@ import kotlin.jvm.JvmName
  */
 typealias PropertyChangeListener = (key: String?, value: Value) -> Unit
 
-interface Meta{
-
-    /**
-     * Get property for given key
-     */
-    operator fun get(key: String): Value
-
-
-    /**
-     * List top level keys for all registered properties
-     */
-    val keys: Collection<String>
-
-}
-
 /**
  * The container for custom properties. Lightweight variant of DataForge Meta
  *
  * TODO separate DataForge Meta definition in an artifact and use it here
  */
-interface Configuration: Meta {
+interface Configuration : Meta {
 
 
     /**
@@ -69,33 +51,11 @@ interface Configuration: Meta {
     }
 
     /**
-     * Create an empty configuration
+     * Create an empty configuration of the same type
      */
     fun empty(): Configuration
-
-    companion object {
-
-        /**
-         * A property delegate that uses custom key
-         */
-        fun value(key: String? = null, default: Value = null) = ConfigDelegate(key, default)
-
-        fun string(key: String? = null, default: String? = null) = StringConfigDelegate(key, default)
-
-        fun boolean(key: String? = null, default: Boolean? = null) = BooleanConfigDelegate(key, default)
-
-        fun number(key: String? = null, default: Number? = null) = NumberConfigDelegate(key, default)
-
-        @JvmName("safeString")
-        fun string(key: String? = null, default: String) = SafeStringConfigDelegate(key, default)
-
-        @JvmName("safeBoolean")
-        fun boolean(key: String? = null, default: Boolean) = SafeBooleanConfigDelegate(key, default)
-
-        @JvmName("safeNumber")
-        fun number(key: String? = null, default: Number) = SafeNumberConfigDelegate(key, default)
-    }
 }
+
 
 fun Configuration.update(other: Meta) {
     other.keys.forEach { key ->
@@ -131,4 +91,7 @@ class ChildConfiguration(private val parent: Configuration, private val path: St
     override fun empty(): Configuration = parent.empty()
 }
 
-fun Configuration.getChild(path: String) = ChildConfiguration(this, path)
+/**
+ * Create a child configuration that delegates all operations to parent. Child could be attached to non-existing node
+ */
+fun Configuration.child(path: String) = ChildConfiguration(this, path)

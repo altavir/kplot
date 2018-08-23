@@ -1,11 +1,11 @@
-package scientifik.kplot.common.remote
+package scientifik.kplot.remote
 
 import kotlinx.coroutines.experimental.launch
-import scientifik.kplot.common.Plot
-import scientifik.kplot.common.PlotData
-import scientifik.kplot.common.PlotFrame
-import scientifik.kplot.common.config.Configuration
-import scientifik.kplot.common.config.StyledConfiguration
+import scientifik.kplot.Plot
+import scientifik.kplot.PlotData
+import scientifik.kplot.PlotFrame
+import scientifik.kplot.config.Configuration
+import scientifik.kplot.config.StyledConfiguration
 
 /**
  * Client implementations for frame and plot. It is supposed that client controls data and configuration while actual plotting is performed on server
