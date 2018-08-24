@@ -8,7 +8,7 @@ import scientifik.kplot.config.createStyle
 import scientifik.kplot.config.style
 import scientifik.kplot.jfreechart.JFreeChartFrame
 import scientifik.kplot.specifications.XYPlot
-import scientifik.kplot.specifications.XYPlotConfiguration
+import scientifik.kplot.specifications.XYPlotConfig
 import scientifik.kplot.xyPlot
 import tornadofx.*
 
@@ -25,7 +25,7 @@ internal class TestView : View() {
     init {
 
         val lineStyle = XYPlot.createStyle {
-            connectionType = XYPlotConfiguration.ConnectionType.STEP
+            connectionType = XYPlotConfig.ConnectionType.STEP
             thickness = 4
             showErrors = false
         }

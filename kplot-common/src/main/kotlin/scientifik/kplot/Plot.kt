@@ -2,7 +2,7 @@ package scientifik.kplot
 
 import scientifik.kplot.config.Configuration
 import scientifik.kplot.config.Styleable
-import scientifik.kplot.specifications.GenericFrameSpecification
+import scientifik.kplot.specifications.GenericFrameConfig
 
 /**
  * A single displayed entity.
@@ -25,8 +25,8 @@ interface PlotFrame : Styleable {
     /**
      * A configuration for the plot
      */
-    val layout: GenericFrameSpecification
-        get() = GenericFrameSpecification(meta)
+    val layout: GenericFrameConfig
+        get() = GenericFrameConfig(meta)
 
     /**
      * Get existing plot or return null is it is not present

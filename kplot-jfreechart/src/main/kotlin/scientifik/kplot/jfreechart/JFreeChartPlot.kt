@@ -3,14 +3,14 @@ package scientifik.kplot.jfreechart
 import org.jfree.data.xy.AbstractXYDataset
 import scientifik.kplot.Plot
 import scientifik.kplot.config.number
-import scientifik.kplot.specifications.XYPlotConfiguration
+import scientifik.kplot.specifications.XYPlotConfig
 import scientifik.kplot.x
 import scientifik.kplot.y
 import java.awt.Color
 
 class JFreeChartPlot(val plot: Plot) : AbstractXYDataset(), Plot by plot {
 
-    val xyMeta: XYPlotConfiguration = XYPlotConfiguration(plot.meta)
+    val xyMeta: XYPlotConfig = XYPlotConfig(plot.meta)
 
     override fun getX(series: Int, item: Int): Number? {
         return plot.data.x[item].number

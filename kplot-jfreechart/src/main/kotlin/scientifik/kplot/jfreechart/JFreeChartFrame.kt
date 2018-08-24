@@ -19,9 +19,9 @@ import scientifik.kplot.ConfigurationMap
 import scientifik.kplot.Plot
 import scientifik.kplot.PlotFrame
 import scientifik.kplot.config.*
-import scientifik.kplot.specifications.GenericAxisSpecification
-import scientifik.kplot.specifications.GenericFrameSpecification
-import scientifik.kplot.specifications.XYPlotConfiguration
+import scientifik.kplot.specifications.GenericAxisConfig
+import scientifik.kplot.specifications.GenericFrameConfig
+import scientifik.kplot.specifications.XYPlotConfig
 import tornadofx.*
 import java.awt.BasicStroke
 import java.awt.Color
@@ -57,7 +57,7 @@ class JFreeChartFrame(title: String? = null, meta: Configuration? = null) : Frag
         }
     }
 
-    override val layout: GenericFrameSpecification = GenericFrameSpecification(this.meta).apply {
+    override val layout: GenericFrameConfig = GenericFrameConfig(this.meta).apply {
         this.title = title
     }
 
@@ -92,9 +92,9 @@ class JFreeChartFrame(title: String? = null, meta: Configuration? = null) : Frag
         }
     }
 
-    private fun buildAxis(meta: GenericAxisSpecification): ValueAxis {
+    private fun buildAxis(meta: GenericAxisConfig): ValueAxis {
         val axis = when (meta.type) {
-            GenericAxisSpecification.AxisType.LOG -> LogarithmicAxis("").apply {
+            GenericAxisConfig.AxisType.LOG -> LogarithmicAxis("").apply {
                 //        logAxis.setMinorTickCount(10);
                 expTickLabelsFlag = true
                 isMinorTickMarksVisible = true
@@ -102,10 +102,10 @@ class JFreeChartFrame(title: String? = null, meta: Configuration? = null) : Frag
                 autoRangeNextLogFlag = true
                 strictValuesFlag = false // Omit negatives but do not throw exception
             }
-            GenericAxisSpecification.AxisType.TIME -> DateAxis().apply {
+            GenericAxisConfig.AxisType.TIME -> DateAxis().apply {
                 timeZone = TimeZone.getTimeZone(meta["timeZone"].string ?: "UTC")
             }
-            GenericAxisSpecification.AxisType.CATEGORY -> throw IllegalArgumentException("Category asis type not supported by JFreeChartFrame")
+            GenericAxisConfig.AxisType.CATEGORY -> throw IllegalArgumentException("Category asis type not supported by JFreeChartFrame")
             else -> NumberAxis().apply {
                 autoRangeIncludesZero = meta["includeZero"].boolean ?: false
                 autoRangeStickyZero = meta["stickyZero"].boolean ?: false
@@ -222,8 +222,8 @@ class JFreeChartFrame(title: String? = null, meta: Configuration? = null) : Frag
             XYErrorRenderer()
         } else {
             when (xyMeta.connectionType) {
-                XYPlotConfiguration.ConnectionType.STEP -> XYStepRenderer()
-                XYPlotConfiguration.ConnectionType.SPLINE -> XYSplineRenderer()
+                XYPlotConfig.ConnectionType.STEP -> XYStepRenderer()
+                XYPlotConfig.ConnectionType.SPLINE -> XYSplineRenderer()
                 else -> XYLineAndShapeRenderer()
             }
         }

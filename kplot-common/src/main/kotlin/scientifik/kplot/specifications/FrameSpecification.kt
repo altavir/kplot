@@ -6,7 +6,7 @@ import scientifik.kplot.config.*
 /**
  * Axis configuration
  */
-open class GenericAxisSpecification(meta: Configuration) : Configuration by meta {
+open class GenericAxisConfig(meta: Configuration) : Configuration by meta {
     enum class AxisType {
         AUTO,
         LINEAR,
@@ -23,38 +23,38 @@ open class GenericAxisSpecification(meta: Configuration) : Configuration by meta
 
     var autoRange: Boolean by boolean(default = true)
 
-    var range by spec(Range)
+    var range by spec(RangeSpec)
 }
 
-object GenericAxis: Specification<GenericAxisSpecification> {
-    override fun wrap(config: Configuration): GenericAxisSpecification = GenericAxisSpecification(config)
+object GenericAxis: Specification<GenericAxisConfig> {
+    override fun wrap(config: Configuration): GenericAxisConfig = GenericAxisConfig(config)
 }
 
 /**
  * Legend configuration. Does not include actual legend items
  */
-open class GenericLegendSpecification(meta: Configuration) : Configuration by meta {
+open class GenericLegendConfig(meta: Configuration) : Configuration by meta {
     var visible: Boolean by boolean(default = true)
 }
 
-object GenericLegend: Specification<GenericLegendSpecification> {
-    override fun wrap(config: Configuration): GenericLegendSpecification = GenericLegendSpecification(config)
+object GenericLegend: Specification<GenericLegendConfig> {
+    override fun wrap(config: Configuration): GenericLegendConfig = GenericLegendConfig(config)
 }
 
 /**
  * Layout configurator
  */
-open class GenericFrameSpecification(meta: Configuration) : Configuration by meta {
+open class GenericFrameConfig(meta: Configuration) : Configuration by meta {
 
     var title: String? by string()
 
     val legend by spec(GenericLegend)
 
-    fun getAxis(axis: String): GenericAxisSpecification {
-        return GenericAxisSpecification(child("axis[$axis]"))
+    fun getAxis(axis: String): GenericAxisConfig {
+        return GenericAxisConfig(child("axis[$axis]"))
     }
 }
 
-object GenericFrame: Specification<GenericFrameSpecification> {
-    override fun wrap(config: Configuration): GenericFrameSpecification = GenericFrameSpecification(config)
+object GenericFrame: Specification<GenericFrameConfig> {
+    override fun wrap(config: Configuration): GenericFrameConfig = GenericFrameConfig(config)
 }

@@ -2,7 +2,7 @@ package scientifik.kplot.specifications
 
 import scientifik.kplot.config.*
 
-open class XYPlotConfiguration(private val meta: Configuration) : Configuration by meta {
+open class XYPlotConfig(private val meta: Configuration) : Configuration by meta {
     enum class ConnectionType {
         DEFAULT,
         SPLINE,
@@ -22,6 +22,6 @@ open class XYPlotConfiguration(private val meta: Configuration) : Configuration 
     var color: String? by string()
 }
 
-object XYPlot: Specification<XYPlotConfiguration> {
-    override fun wrap(config: Configuration): XYPlotConfiguration = XYPlotConfiguration(config)
+object XYPlot: Specification<XYPlotConfig> {
+    override fun wrap(config: Configuration): XYPlotConfig = XYPlotConfig(config)
 }
