@@ -14,6 +14,6 @@ val Value.string: String?
 val Value.boolean: Boolean?
     get() = (this as? Boolean) ?: this?.toString()?.toBoolean()
 
-data class Range(val from: Value, val to: Value) {
-    fun isFinite() = from.number?.toDouble()?.isFinite() ?: false  && to.number?.toDouble()?.isFinite() ?: false
-}
+//data class Range(val from: Value, val to: Value) {
+//    fun isFinite() = from.number?.toDouble()?.isFinite() ?: false  && to.number?.toDouble()?.isFinite() ?: false
+//}

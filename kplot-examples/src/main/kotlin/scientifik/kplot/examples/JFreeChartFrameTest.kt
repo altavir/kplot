@@ -1,7 +1,6 @@
 package scientifik.kplot.examples
 
 import javafx.application.Application
-import javafx.scene.Parent
 import scientifik.kplot.appendXY
 import scientifik.kplot.config.configure
 import scientifik.kplot.config.createStyle
@@ -20,7 +19,9 @@ fun main(args: Array<String>) {
 
 internal class TestView : View() {
     private val frame = JFreeChartFrame()
-    override val root: Parent = frame.root
+    override val root = borderpane {
+        center = frame.root
+    }
 
     init {
 

@@ -2,7 +2,6 @@ package scientifik.kplot.config
 
 import kotlin.jvm.JvmName
 import kotlin.properties.ReadWriteProperty
-import kotlin.reflect.KClass
 import kotlin.reflect.KProperty
 
 class ConfigDelegate(private val key: String? = null, private val default: Value = null) : ReadWriteProperty<Configuration, Value> {
@@ -77,14 +76,9 @@ class SafeNumberConfigDelegate(private val key: String? = null, private val defa
     }
 }
 
-/**
- * A patch to work around verification error in JVM
- */
-internal expect fun <E : Enum<E>> strToEnum(type: KClass<out E>, name: String): E
-
-class SafeEnumvConfigDelegate<E : Enum<E>>(private val key: String? = null, private val default: E) : ReadWriteProperty<Configuration, E> {
+class SafeEnumvConfigDelegate<E : Enum<E>>(private val key: String? = null, private val default: E, private val resolver: (String) -> E) : ReadWriteProperty<Configuration, E> {
     override fun getValue(thisRef: Configuration, property: KProperty<*>): E {
-        return (thisRef[key ?: property.name].string)?.let { strToEnum<E>(default::class, it) } ?: default
+        return (thisRef[key ?: property.name].string)?.let { resolver(it) } ?: default
     }
 
     override fun setValue(thisRef: Configuration, property: KProperty<*>, value: E) {
@@ -116,6 +110,8 @@ fun Configuration.boolean(key: String? = null, default: Boolean? = null) = Boole
 
 fun Configuration.number(key: String? = null, default: Number? = null) = NumberConfigDelegate(key, default)
 
+fun Configuration.child(key: String? = null) = ChildConfigDelegate<Configuration>(key){it}
+
 fun <T : Configuration> Configuration.child(key: String? = null, converter: (Configuration) -> T) = ChildConfigDelegate<T>(key, converter)
 
 fun <T : Configuration> Configuration.spec(spec: Specification<T>, key: String? = null) = ChildConfigDelegate<T>(key) { spec.wrap(this) }
@@ -129,4 +125,4 @@ fun Configuration.boolean(key: String? = null, default: Boolean) = SafeBooleanCo
 @JvmName("safeNumber")
 fun Configuration.number(key: String? = null, default: Number) = SafeNumberConfigDelegate(key, default)
 
-fun <E : Enum<E>> Configuration.enum(default: E, key: String? = null) = SafeEnumvConfigDelegate(key, default)
+inline fun <reified E : Enum<E>> Configuration.enum(default: E, key: String? = null) = SafeEnumvConfigDelegate(key, default) { enumValueOf(it) }

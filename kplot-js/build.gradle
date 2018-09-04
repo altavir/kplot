@@ -1,21 +1,17 @@
-
-
 plugins {
     id 'kotlin-platform-js'
 }
 
-
-group 'hep.dataforge'
-version '1.0-SNAPSHOT'
+group 'scientifik.kplot'
+version '0.0.1-SNAPSHOT'
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    compile project(":kplot-js")
+    expectedBy project(":kplot-common")
 
     compile "org.jetbrains.kotlin:kotlin-stdlib-js"
     testCompile "org.jetbrains.kotlin:kotlin-test-js"
 }
-

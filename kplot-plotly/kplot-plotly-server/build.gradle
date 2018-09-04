@@ -1,0 +1,47 @@
+buildscript {
+    repositories {
+        jcenter()
+        maven {
+            url "https://dl.bintray.com/kotlin/kotlin-eap"
+        }
+    }
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-frontend-plugin:0.0.37"
+    }
+}
+
+plugins {
+    id 'kotlin-platform-js'
+}
+
+apply plugin: 'org.jetbrains.kotlin.frontend'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile "org.jetbrains.kotlin:kotlin-stdlib-js"
+    testCompile "org.jetbrains.kotlin:kotlin-test-js"
+}
+
+
+compileKotlin2Js {
+    kotlinOptions.metaInfo = true
+    kotlinOptions.outputFile = "${project.buildDir.path}/js/${project.name}.js"
+    kotlinOptions.sourceMap = true
+    kotlinOptions.sourceMapEmbedSources = "always"
+    kotlinOptions.moduleKind = 'umd'
+    kotlinOptions.main = "call"
+}
+
+kotlinFrontend {
+    npm {
+        dependency "plotly"
+    }
+
+    webpackBundle {
+        bundleName = "main"
+        contentPath = file('src/main/web')
+    }
+}

@@ -1,7 +1,6 @@
 package scientifik.kplot.jfreechart
 
 import javafx.application.Platform.runLater
-import javafx.scene.Parent
 import org.jfree.chart.JFreeChart
 import org.jfree.chart.axis.DateAxis
 import org.jfree.chart.axis.LogarithmicAxis
@@ -22,22 +21,16 @@ import scientifik.kplot.config.*
 import scientifik.kplot.specifications.GenericAxisConfig
 import scientifik.kplot.specifications.GenericFrameConfig
 import scientifik.kplot.specifications.XYPlotConfig
-import tornadofx.*
 import java.awt.BasicStroke
 import java.awt.Color
 import java.awt.Shape
 import java.util.*
 import kotlin.math.absoluteValue
 
-class JFreeChartFrame(title: String? = null, meta: Configuration? = null) : Fragment(title), PlotFrame {
+class JFreeChartFrame(meta: Configuration? = null) : PlotFrame {
 
     private val xyPlot: XYPlot = XYPlot(null, NumberAxis(), NumberAxis(), XYLineAndShapeRenderer())
     private val chart: JFreeChart = JFreeChart(xyPlot)
-
-    override val root: Parent = borderpane {
-        center = ChartViewer(chart)
-    }
-
 
     // color and shape cache
     private val colorCache = HashMap<String, Color>()
@@ -57,16 +50,16 @@ class JFreeChartFrame(title: String? = null, meta: Configuration? = null) : Frag
         }
     }
 
-    override val layout: GenericFrameConfig = GenericFrameConfig(this.meta).apply {
-        this.title = title
-    }
+    override val layout: GenericFrameConfig = GenericFrameConfig(this.meta)
+
+    val root by lazy { ChartViewer(chart) }
 
     override fun get(key: String): JFreeChartPlot? {
         return index[key]?.let { xyPlot.getDataset(it) } as JFreeChartPlot?
     }
 
     override fun set(key: String, plot: Plot) {
-        synchronized(this){
+        synchronized(this) {
             val i = plot.hashCode().absoluteValue
             if (index.containsKey(key)) {
                 index.remove(key)
