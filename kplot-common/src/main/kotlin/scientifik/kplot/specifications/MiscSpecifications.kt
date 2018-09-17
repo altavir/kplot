@@ -1,14 +1,15 @@
 package scientifik.kplot.specifications
 
-import scientifik.kplot.config.Configuration
-import scientifik.kplot.config.Specification
-import scientifik.kplot.config.value
+import hep.dataforge.meta.Config
+import hep.dataforge.meta.Specification
+import hep.dataforge.meta.SpecificationBuilder
+import hep.dataforge.meta.value
 
-class RangeConfig(meta: Configuration) : Configuration by meta {
+class RangeConfig(override  val config: Config) : Specification {
     val from by value()
     val to by value()
 }
 
-object RangeSpec: Specification<RangeConfig> {
-    override fun wrap(config: Configuration): RangeConfig = RangeConfig(config)
+object RangeSpec: SpecificationBuilder<RangeConfig> {
+    override fun wrap(config: Config): RangeConfig = RangeConfig(config)
 }

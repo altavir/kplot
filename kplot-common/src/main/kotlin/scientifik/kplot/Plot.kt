@@ -1,8 +1,8 @@
 package scientifik.kplot
 
-import scientifik.kplot.config.Configuration
-import scientifik.kplot.config.Styleable
-import scientifik.kplot.specifications.GenericFrameConfig
+import hep.dataforge.meta.Meta
+import hep.dataforge.meta.Styleable
+import scientifik.kplot.specifications.GenericFrameSpec
 
 /**
  * A single displayed entity.
@@ -25,8 +25,8 @@ interface PlotFrame : Styleable {
     /**
      * A configuration for the plot
      */
-    val layout: GenericFrameConfig
-        get() = GenericFrameConfig(meta)
+    val layout: GenericFrameSpec
+        get() = GenericFrameSpec(config)
 
     /**
      * Get existing plot or return null is it is not present
@@ -47,5 +47,5 @@ interface PlotFrame : Styleable {
      * Apply configuration to plot each plot with name starting with [key]. Meaning that if there are plots with keys
      * `a.b.c` and `a.b.d` and key is `a.b`, both plots will bi updated
      */
-    fun configure(key: String, meta: Configuration)
+    fun configure(key: String, meta: Meta)
 }

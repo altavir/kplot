@@ -1,62 +1,6 @@
 package scientifik.kplot
 
-import scientifik.kplot.config.*
-
-/**
- * Simple multiplatform implementations for [Configuration], [Plot] and [PlotData]
- */
-
-/**
- * Basic implementation for a property holder
- */
-class ConfigurationMap(private val map: MutableMap<String, Value> = HashMap()) : Configuration {
-    private val listeners: MutableSet<PropertyChangeListener> = HashSet()
-
-    override val keys: Collection<String> = map.keys
-
-    /**
-     * Apply "soft" path-name search meaning that element with name containing dots is returned as is, but if it is not found,
-     * the search is delegated to the entry found by the first token separated by `.`. The use of `.` in names should be avoided
-     */
-    override fun get(key: String): Value = map[key] ?: run {
-        (map[key.substringBefore(".")] as? ConfigurationMap)?.get(key.substringAfter("."))
-    }
-
-    /**
-     * Use "hard" path-name, meaning than intermediate nodes are created for each segment between `.`
-     */
-    override fun set(key: String, value: Value) {
-        if (key.contains(".")) {
-            key.substringBefore(".") to {
-                this[key.substringAfter(".")] = value
-            }
-        } else {
-            map[key] = value
-        }
-        invalidate(key)
-    }
-
-    override fun String.to(meta: Configuration) {
-        meta.onChange { key, _ ->
-            invalidate("${this}.$key")
-        }
-        set(this, meta)
-    }
-
-    override fun onChange(listener: PropertyChangeListener) {
-        listeners.add(listener)
-    }
-
-    override fun removeListener(listener: PropertyChangeListener) {
-        listeners.remove(listener)
-    }
-
-    override fun invalidate(key: String?) {
-        listeners.forEach { it.invoke(key, key?.let { key -> get(key) }) }
-    }
-
-    override fun empty(): Configuration = ConfigurationMap()
-}
+import hep.dataforge.meta.*
 
 /**
  * Simple implementation of [PlotData]
@@ -93,7 +37,7 @@ class SimplePlotDataBuilder(override val axes: List<String>) : MutablePlotData {
     override fun append(map: Map<String, Value>) {
         synchronized(this) {
             axes.forEach {
-                data[it]?.add(map[it])
+                data[it]?.add(map[it] ?: Null)
             }
         }
     }
@@ -124,12 +68,12 @@ class SimplePlotDataBuilder(override val axes: List<String>) : MutablePlotData {
 /**
  * Simple implementation of [Plot]
  */
-class SimplePlot(override val data: PlotData, meta: Configuration) : Plot {
-    override val meta: StyledConfiguration = meta.asStyleable()
+class SimplePlot(override val data: PlotData, meta: Config, style: Meta = EmptyMeta) : Plot {
+    override val styledConfig: StyledConfig = meta.withStyle(style)
 }
 
-fun MutablePlotData.appendXY(x: Value, y: Value) = append(Plot.X_AXIS to x, Plot.Y_AXIS to y)
+fun MutablePlotData.appendXY(x: Any?, y: Any?) = append(Plot.X_AXIS to Value.of(x), Plot.Y_AXIS to Value.of(y))
 
-fun xyPlot(meta: Configuration = ConfigurationMap(), builder: MutablePlotData.() -> Unit): SimplePlot {
-    return SimplePlot(SimplePlotDataBuilder(listOf(Plot.X_AXIS, Plot.Y_AXIS)).apply(builder), meta)
+fun xyPlot(config: Config = Config(), style: Meta = EmptyMeta, builder: MutablePlotData.() -> Unit): SimplePlot {
+    return SimplePlot(SimplePlotDataBuilder(listOf(Plot.X_AXIS, Plot.Y_AXIS)).apply(builder), config, style)
 }

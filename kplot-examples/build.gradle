@@ -12,15 +12,16 @@ repositories {
 dependencies {
     compile project(":kplot-jfreechart")
 
-    testCompile "org.jetbrains.kotlin:kotlin-test"
-    testCompile "org.jetbrains.kotlin:kotlin-test-junit"
+    testCompile "org.jetbrains.kotlin:kotlin-test-junit5"
+
     testImplementation(
             'org.junit.jupiter:junit-jupiter-api:5.2.0'
     )
     testRuntimeOnly(
             'org.junit.jupiter:junit-jupiter-engine:5.2.0'
     )
-    implementation 'com.github.altavir.kmath:kmath-jvm:dev-SNAPSHOT'
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+    //implementation 'com.github.altavir.kmath:kmath-jvm:dev-SNAPSHOT'
 }
 
 compileKotlin {

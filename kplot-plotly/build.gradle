@@ -1,5 +1,3 @@
-
-
 plugins {
     id 'kotlin-platform-js'
 }
@@ -17,5 +15,6 @@ dependencies {
 
     compile "org.jetbrains.kotlin:kotlin-stdlib-js"
     testCompile "org.jetbrains.kotlin:kotlin-test-js"
+    compile "org.jetbrains.kotlin:kotlin-stdlib"
 }
 

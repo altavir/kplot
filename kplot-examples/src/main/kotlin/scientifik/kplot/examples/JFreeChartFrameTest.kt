@@ -1,13 +1,12 @@
 package scientifik.kplot.examples
 
+import hep.dataforge.meta.configure
+import hep.dataforge.meta.createStyle
 import javafx.application.Application
 import scientifik.kplot.appendXY
-import scientifik.kplot.config.configure
-import scientifik.kplot.config.createStyle
-import scientifik.kplot.config.style
 import scientifik.kplot.jfreechart.JFreeChartFrame
 import scientifik.kplot.specifications.XYPlot
-import scientifik.kplot.specifications.XYPlotConfig
+import scientifik.kplot.specifications.XYPlotSpec
 import scientifik.kplot.xyPlot
 import tornadofx.*
 
@@ -26,14 +25,14 @@ internal class TestView : View() {
     init {
 
         val lineStyle = XYPlot.createStyle {
-            connectionType = XYPlotConfig.ConnectionType.STEP
+            connectionType = XYPlotSpec.ConnectionType.STEP
             thickness = 4
             showErrors = false
         }
 
-        frame["test"] = xyPlot {
+        frame["test"] = xyPlot(style = lineStyle) {
             (1..100).forEach { appendXY(it, it * it) }
-        }.style(lineStyle).configure(XYPlot) {
+        }.configure(XYPlot) {
             title = "My test plot"
             //showLines = false
         }

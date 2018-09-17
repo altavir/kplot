@@ -1,11 +1,11 @@
 package scientifik.kplot.remote
 
+import hep.dataforge.meta.Meta
+import hep.dataforge.meta.StyledConfig
 import kotlinx.coroutines.experimental.launch
 import scientifik.kplot.Plot
 import scientifik.kplot.PlotData
 import scientifik.kplot.PlotFrame
-import scientifik.kplot.config.Configuration
-import scientifik.kplot.config.StyledConfiguration
 
 /**
  * Client implementations for frame and plot. It is supposed that client controls data and configuration while actual plotting is performed on server
@@ -40,11 +40,11 @@ class ClientPlotFrame(val remote: Remote, val id: String) : PlotFrame {
         }
     }
 
-    override fun configure(key: String, meta: Configuration) {
+    override fun configure(key: String, meta: Meta) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override val meta: StyledConfiguration
+    override val styledConfig: StyledConfig
         get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
 
 }
@@ -53,7 +53,6 @@ class RemotePlot(val remote: Remote) : Plot {
     override val data: PlotData
         get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
 
-    override val meta: StyledConfiguration
+    override val styledConfig: StyledConfig
         get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
-
 }

@@ -1,6 +1,6 @@
 package scientifik.kplot
 
-import scientifik.kplot.config.Value
+import hep.dataforge.meta.Value
 
 /**
  * Generic scatter plot data. Data is organized in axis. Each axis consists a list of values of the same length.

@@ -1,8 +1,8 @@
 package scientifik.kplot.specifications
 
-import scientifik.kplot.config.*
+import hep.dataforge.meta.*
 
-open class XYPlotConfig(private val meta: Configuration) : Configuration by meta {
+open class XYPlotSpec(override val config: Config) : Specification {
     enum class ConnectionType {
         DEFAULT,
         SPLINE,
@@ -22,6 +22,6 @@ open class XYPlotConfig(private val meta: Configuration) : Configuration by meta
     var color: String? by string()
 }
 
-object XYPlot: Specification<XYPlotConfig> {
-    override fun wrap(config: Configuration): XYPlotConfig = XYPlotConfig(config)
+object XYPlot: SpecificationBuilder<XYPlotSpec> {
+    override fun wrap(config: Config): XYPlotSpec = XYPlotSpec(config)
 }

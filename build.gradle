@@ -1,6 +1,7 @@
 buildscript {
-    ext.kotlin_version = '1.2.61'
+    ext.kotlin_version = '1.2.70'
     ext.serialization_version = '0.6.1'
+    ext.dfmeta_version = "0.1.1"
     repositories {
         jcenter()
         maven { url "https://kotlin.bintray.com/kotlinx" }
@@ -16,12 +17,13 @@ subprojects{
     repositories {
         jcenter()
         maven { url "https://kotlin.bintray.com/kotlinx" }
+        maven { url 'https://jitpack.io' }
     }
 }
 
 
 group 'scientifik.kplot'
-version '0.0.1-SNAPSHOT'
+version '0.1.0-SNAPSHOT'
 
 repositories {
     mavenCentral()

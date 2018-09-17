@@ -1,12 +1,13 @@
 package scientifik.kplot.specifications
 
-import scientifik.kplot.config.*
+import hep.dataforge.meta.*
 
 
 /**
  * Axis configuration
  */
-open class GenericAxisConfig(meta: Configuration) : Configuration by meta {
+open class GenericAxisSpec(override val config: Config) : Specification {
+
     enum class AxisType {
         AUTO,
         LINEAR,
@@ -26,35 +27,35 @@ open class GenericAxisConfig(meta: Configuration) : Configuration by meta {
     var range by spec(RangeSpec)
 }
 
-object GenericAxis: Specification<GenericAxisConfig> {
-    override fun wrap(config: Configuration): GenericAxisConfig = GenericAxisConfig(config)
+object GenericAxis: SpecificationBuilder<GenericAxisSpec> {
+    override fun wrap(config: Config): GenericAxisSpec = GenericAxisSpec(config)
 }
 
 /**
  * Legend configuration. Does not include actual legend items
  */
-open class GenericLegendConfig(meta: Configuration) : Configuration by meta {
+open class GenericLegendSpec(override val config: Config) : Specification {
     var visible: Boolean by boolean(default = true)
 }
 
-object GenericLegend: Specification<GenericLegendConfig> {
-    override fun wrap(config: Configuration): GenericLegendConfig = GenericLegendConfig(config)
+object GenericLegend: SpecificationBuilder<GenericLegendSpec> {
+    override fun wrap(config: Config): GenericLegendSpec = GenericLegendSpec(config)
 }
 
 /**
  * Layout configurator
  */
-open class GenericFrameConfig(meta: Configuration) : Configuration by meta {
+open class GenericFrameSpec(override  val config: Config) : Specification {
 
     var title: String? by string()
 
     val legend by spec(GenericLegend)
 
-    fun getAxis(axis: String): GenericAxisConfig {
-        return GenericAxisConfig(child("axis[$axis]"))
+    fun getAxis(axis: String): GenericAxisSpec {
+        return GenericAxisSpec(this.config["axis[$axis]"]!!.node)
     }
 }
 
-object GenericFrame: Specification<GenericFrameConfig> {
-    override fun wrap(config: Configuration): GenericFrameConfig = GenericFrameConfig(config)
+object GenericFrame: SpecificationBuilder<GenericFrameSpec> {
+    override fun wrap(config: Config): GenericFrameSpec = GenericFrameSpec(config)
 }

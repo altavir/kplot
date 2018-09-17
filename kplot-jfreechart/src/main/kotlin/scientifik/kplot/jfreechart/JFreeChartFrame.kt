@@ -1,5 +1,6 @@
 package scientifik.kplot.jfreechart
 
+import hep.dataforge.meta.*
 import javafx.application.Platform.runLater
 import org.jfree.chart.JFreeChart
 import org.jfree.chart.axis.DateAxis
@@ -14,20 +15,18 @@ import org.jfree.chart.renderer.xy.XYSplineRenderer
 import org.jfree.chart.renderer.xy.XYStepRenderer
 import org.jfree.chart.title.LegendTitle
 import org.jfree.chart.title.TextTitle
-import scientifik.kplot.ConfigurationMap
 import scientifik.kplot.Plot
 import scientifik.kplot.PlotFrame
-import scientifik.kplot.config.*
-import scientifik.kplot.specifications.GenericAxisConfig
-import scientifik.kplot.specifications.GenericFrameConfig
-import scientifik.kplot.specifications.XYPlotConfig
+import scientifik.kplot.specifications.GenericAxisSpec
+import scientifik.kplot.specifications.GenericFrameSpec
+import scientifik.kplot.specifications.XYPlotSpec
 import java.awt.BasicStroke
 import java.awt.Color
 import java.awt.Shape
 import java.util.*
 import kotlin.math.absoluteValue
 
-class JFreeChartFrame(meta: Configuration? = null) : PlotFrame {
+class JFreeChartFrame(meta: Config? = null) : PlotFrame {
 
     private val xyPlot: XYPlot = XYPlot(null, NumberAxis(), NumberAxis(), XYLineAndShapeRenderer())
     private val chart: JFreeChart = JFreeChart(xyPlot)
@@ -43,14 +42,14 @@ class JFreeChartFrame(meta: Configuration? = null) : PlotFrame {
 
     //TODO store x and y ranges
 
-    override val meta = (meta ?: ConfigurationMap()).asStyleable().apply {
-        onChange { _, _ ->
+    override val styledConfig = (meta ?: Config()).withStyle().apply {
+        onChange { _, _, _ ->
             //TODO differentiate parameters?
             updateFrame()
         }
     }
 
-    override val layout: GenericFrameConfig = GenericFrameConfig(this.meta)
+    override val layout: GenericFrameSpec = GenericFrameSpec(this.styledConfig.config)
 
     val root by lazy { ChartViewer(chart) }
 
@@ -78,16 +77,16 @@ class JFreeChartFrame(meta: Configuration? = null) : PlotFrame {
         }
     }
 
-    override fun configure(key: String, meta: Configuration) {
+    override fun configure(key: String, meta: Meta) {
         get(key)?.let {
-            it.meta.update(meta)
+            it.config.update(meta)
             render(key)
         }
     }
 
-    private fun buildAxis(meta: GenericAxisConfig): ValueAxis {
+    private fun buildAxis(meta: GenericAxisSpec): ValueAxis {
         val axis = when (meta.type) {
-            GenericAxisConfig.AxisType.LOG -> LogarithmicAxis("").apply {
+            GenericAxisSpec.AxisType.LOG -> LogarithmicAxis("").apply {
                 //        logAxis.setMinorTickCount(10);
                 expTickLabelsFlag = true
                 isMinorTickMarksVisible = true
@@ -95,23 +94,23 @@ class JFreeChartFrame(meta: Configuration? = null) : PlotFrame {
                 autoRangeNextLogFlag = true
                 strictValuesFlag = false // Omit negatives but do not throw exception
             }
-            GenericAxisConfig.AxisType.TIME -> DateAxis().apply {
-                timeZone = TimeZone.getTimeZone(meta["timeZone"].string ?: "UTC")
+            GenericAxisSpec.AxisType.TIME -> DateAxis().apply {
+                timeZone = TimeZone.getTimeZone(meta["timeZone"]?.string ?: "UTC")
             }
-            GenericAxisConfig.AxisType.CATEGORY -> throw IllegalArgumentException("Category asis type not supported by JFreeChartFrame")
+            GenericAxisSpec.AxisType.CATEGORY -> throw IllegalArgumentException("Category asis type not supported by JFreeChartFrame")
             else -> NumberAxis().apply {
-                autoRangeIncludesZero = meta["includeZero"].boolean ?: false
-                autoRangeStickyZero = meta["stickyZero"].boolean ?: false
+                autoRangeIncludesZero = meta["includeZero"]?.boolean ?: false
+                autoRangeStickyZero = meta["stickyZero"]?.boolean ?: false
             }
         }
 
-        meta.range.from.number?.toDouble()?.let {
+        meta.range.from?.number?.toDouble()?.let {
             if (it.isFinite()) {
                 axis.lowerBound = it
             }
         }
 
-        meta.range.to.number?.toDouble()?.let {
+        meta.range.to?.number?.toDouble()?.let {
             if (it.isFinite()) {
                 axis.upperBound = it
             }
@@ -215,8 +214,8 @@ class JFreeChartFrame(meta: Configuration? = null) : PlotFrame {
             XYErrorRenderer()
         } else {
             when (xyMeta.connectionType) {
-                XYPlotConfig.ConnectionType.STEP -> XYStepRenderer()
-                XYPlotConfig.ConnectionType.SPLINE -> XYSplineRenderer()
+                XYPlotSpec.ConnectionType.STEP -> XYStepRenderer()
+                XYPlotSpec.ConnectionType.SPLINE -> XYSplineRenderer()
                 else -> XYLineAndShapeRenderer()
             }
         }

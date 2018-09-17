@@ -17,3 +17,11 @@ include 'kplot-jvm'
 include "kplot-js"
 include 'kplot-plotly:kplot-plotly-server'
 
+if(file("../dataforge-meta").exists()){
+    includeBuild("../dataforge-meta"){
+        dependencySubstitution {
+            substitute module("com.github.altavir:dataforge-meta:0.1.1") with project(':')
+            substitute module("com.github.altavir:dataforge-meta-jvm:0.1.1") with project(':dataforge-meta-jvm')
+        }
+    }
+}

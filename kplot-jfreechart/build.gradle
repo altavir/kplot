@@ -4,21 +4,15 @@ plugins {
 
 description = "A JavaFX jfreechart implementation for kplot API"
 
-repositories {
-    mavenCentral()
-}
-
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
-
-    // https://mvnrepository.com/artifact/org.jfree/jfreechart-fx
     compile group: 'org.jfree', name: 'jfreechart-fx', version: '1.0.1'
     compile 'no.tornado:tornadofx:1.7.16'
 
     compile project(":kplot-jvm")
 
-    testCompile "org.jetbrains.kotlin:kotlin-test"
-    testCompile "org.jetbrains.kotlin:kotlin-test-junit"
+
+    testCompile "org.jetbrains.kotlin:kotlin-test-junit5"
 
     testImplementation(
             'org.junit.jupiter:junit-jupiter-api:5.2.0'
