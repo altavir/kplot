@@ -44,7 +44,7 @@ class ClientPlotFrame(val remote: Remote, val id: String) : PlotFrame {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override val styledConfig: StyledConfig
+    override val config: StyledConfig
         get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
 
 }
@@ -53,6 +53,6 @@ class RemotePlot(val remote: Remote) : Plot {
     override val data: PlotData
         get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
 
-    override val styledConfig: StyledConfig
+    override val config: StyledConfig
         get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
 }

@@ -26,7 +26,7 @@ import java.awt.Shape
 import java.util.*
 import kotlin.math.absoluteValue
 
-class JFreeChartFrame(meta: Config? = null) : PlotFrame {
+class JFreeChartFrame(meta: Config? = null, style: Meta = EmptyMeta) : PlotFrame {
 
     private val xyPlot: XYPlot = XYPlot(null, NumberAxis(), NumberAxis(), XYLineAndShapeRenderer())
     private val chart: JFreeChart = JFreeChart(xyPlot)
@@ -42,14 +42,14 @@ class JFreeChartFrame(meta: Config? = null) : PlotFrame {
 
     //TODO store x and y ranges
 
-    override val styledConfig = (meta ?: Config()).withStyle().apply {
+    override val config = (meta ?: Config()).withStyle(style).apply {
         onChange { _, _, _ ->
             //TODO differentiate parameters?
             updateFrame()
         }
     }
 
-    override val layout: GenericFrameSpec = GenericFrameSpec(this.styledConfig.config)
+    override val layout: GenericFrameSpec = GenericFrameSpec(this.config)
 
     val root by lazy { ChartViewer(chart) }
 
@@ -210,6 +210,7 @@ class JFreeChartFrame(meta: Config? = null) : PlotFrame {
     }
 
     private fun JFreeChartPlot.createRenderer(key: String): XYLineAndShapeRenderer {
+        val xyMeta: XYPlotSpec = scientifik.kplot.specifications.XYPlot.wrap(plot.config)
         val render: XYLineAndShapeRenderer = if (xyMeta.showErrors) {
             XYErrorRenderer()
         } else {
@@ -226,7 +227,7 @@ class JFreeChartFrame(meta: Config? = null) : PlotFrame {
         //Build Legend map to avoid serialization issues
         render.setSeriesStroke(0, BasicStroke(xyMeta.thickness.toFloat()))
 
-        (awtColor ?: colorCache[key])?.let { render.setSeriesPaint(0, it) }
+        (xyMeta.awtColor ?: colorCache[key])?.let { render.setSeriesPaint(0, it) }
 
         shapeCache[key]?.let { render.setSeriesShape(0, it) }
 

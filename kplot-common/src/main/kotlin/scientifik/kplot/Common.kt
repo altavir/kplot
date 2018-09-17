@@ -69,7 +69,7 @@ class SimplePlotDataBuilder(override val axes: List<String>) : MutablePlotData {
  * Simple implementation of [Plot]
  */
 class SimplePlot(override val data: PlotData, meta: Config, style: Meta = EmptyMeta) : Plot {
-    override val styledConfig: StyledConfig = meta.withStyle(style)
+    override val config: StyledConfig = meta.withStyle(style)
 }
 
 fun MutablePlotData.appendXY(x: Any?, y: Any?) = append(Plot.X_AXIS to Value.of(x), Plot.Y_AXIS to Value.of(y))
