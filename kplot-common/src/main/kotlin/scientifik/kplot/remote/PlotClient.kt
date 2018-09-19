@@ -12,7 +12,7 @@ import scientifik.kplot.PlotFrame
  */
 
 /**
- * A remote client [PlotFrame]
+ * A remote client [PlotFrame]. The client controls the plotting but does not do rendering
  *
  * @param remote A remote that performs transactions
  * @param id and identification of the remote plot

@@ -1,6 +1,12 @@
 pluginManagement {
     resolutionStrategy {
         eachPlugin {
+            if (requested.id.id == "kotlin-platform-common") {
+                useModule("org.jetbrains.kotlin:kotlin-gradle-plugin:${requested.version}")
+            }
+            if (requested.id.id == "kotlin-platform-jvm") {
+                useModule("org.jetbrains.kotlin:kotlin-gradle-plugin:${requested.version}")
+            }
             if (requested.id.id == "kotlin-platform-js") {
                 useModule("org.jetbrains.kotlin:kotlin-gradle-plugin:${requested.version}")
             }
@@ -17,10 +23,10 @@ include 'kplot-jvm'
 include "kplot-js"
 include 'kplot-plotly:kplot-plotly-server'
 
-if(file("../dataforge-meta").exists()){
-    includeBuild("../dataforge-meta"){
+if (file("../dataforge-meta").exists()) {
+    includeBuild("../dataforge-meta") {
         dependencySubstitution {
-            substitute module("com.github.altavir:dataforge-meta:0.1.1") with project(':')
+            substitute module("com.github.altavir:dataforge-meta-common:0.1.1") with project(':dataforge-meta-common')
             substitute module("com.github.altavir:dataforge-meta-jvm:0.1.1") with project(':dataforge-meta-jvm')
         }
     }
