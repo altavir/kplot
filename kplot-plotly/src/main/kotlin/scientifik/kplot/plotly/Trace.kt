@@ -1,20 +1,21 @@
 package scientifik.kplot.plotly
 
+import hep.dataforge.meta.*
+import hep.dataforge.values.Value
 import scientifik.kplot.Plot
-import scientifik.kplot.config.*
 import scientifik.kplot.x
 import scientifik.kplot.y
 import scientifik.kplot.z
 
 class Trace(plot: Plot) : Plot by plot {
-    private val traceConfig = TraceConfig(meta)
+    private val traceConfig = TraceConfig(config)
 
     val type: String get() = traceConfig.type
 
     val x: List<Value> get() = data.x
     val y: List<Value> get() = data.y
     val z: List<Value> get() = data.z
-    val line: Meta get() = traceConfig.line
+    val line: Meta get() = traceConfig.line.config
     val name: String? get() = traceConfig.name
 
 //    var xy: Float32Array?
@@ -33,8 +34,8 @@ class Trace(plot: Plot) : Plot by plot {
 //    var visible: dynamic /* Boolean | String /* "legendonly" */ */
 }
 
-class TraceConfig(meta: Configuration) : Configuration by meta {
+class TraceConfig(override val config: Config) : Specification {
     var type by string(default = "scatted")
-    var line: Configuration by child()
+    var line by child()
     var name by string()
 }

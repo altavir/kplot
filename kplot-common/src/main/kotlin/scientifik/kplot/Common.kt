@@ -1,6 +1,8 @@
 package scientifik.kplot
 
 import hep.dataforge.meta.*
+import hep.dataforge.values.Null
+import hep.dataforge.values.Value
 
 /**
  * Simple implementation of [PlotData]

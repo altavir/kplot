@@ -1,21 +1,14 @@
 plugins {
     id 'kotlin-platform-common'
-    id 'kotlinx-serialization'
 }
 
 dependencies {
-    compile  "org.jetbrains.kotlin:kotlin-stdlib-common:$kotlin_version"
-    compile "com.github.altavir:dataforge-meta-common:$dfmeta_version"
-    compile  "org.jetbrains.kotlinx:kotlinx-serialization-runtime-common:$serialization_version"
+    api "org.jetbrains.kotlin:kotlin-stdlib-common:$kotlin_version"
+    api "hep.dataforge:dataforge-meta:$dfmeta_version"
+    api "hep.dataforge:dataforge-meta-metadata:$dfmeta_version"
 
-    compile 'org.jetbrains.kotlinx:kotlinx-coroutines-core-common:0.25.0'
+    api 'org.jetbrains.kotlinx:kotlinx-coroutines-core-common:1.0.1'
 
     testCompile "org.jetbrains.kotlin:kotlin-test-annotations-common"
     testCompile "org.jetbrains.kotlin:kotlin-test-common"
-}
-
-kotlin {
-    experimental {
-        coroutines "enable"
-    }
 }

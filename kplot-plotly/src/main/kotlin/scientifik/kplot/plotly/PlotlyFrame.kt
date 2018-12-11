@@ -1,24 +1,24 @@
 package scientifik.kplot.plotly
 
+import hep.dataforge.meta.Config
+import hep.dataforge.meta.Meta
+import hep.dataforge.meta.update
+import hep.dataforge.meta.withStyle
 import org.w3c.dom.Element
 import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.HTMLElement
-import scientifik.kplot.ConfigurationMap
 import scientifik.kplot.Plot
 import scientifik.kplot.PlotFrame
-import scientifik.kplot.config.Configuration
-import scientifik.kplot.config.asStyleable
-import scientifik.kplot.config.update
 import kotlin.js.Promise
 
 external object Plotly {
-    fun react(root: Element, data: List<Trace>, layout: Configuration = definedExternally, config: Configuration = definedExternally): Promise<HTMLElement>;
+    fun react(root: Element, data: List<Trace>, layout: Config = definedExternally, config: Config = definedExternally): Promise<HTMLElement>;
 }
 
-class PlotlyFrame(val element: HTMLDivElement, meta: Configuration? = null) : PlotFrame {
+class PlotlyFrame(val element: HTMLDivElement, meta: Config? = null) : PlotFrame {
 
-    override val meta = (meta ?: ConfigurationMap()).asStyleable().apply {
-        onChange { _, _ ->
+    override val config = (meta ?: Config()).withStyle().apply {
+        onChange { _, _, _ ->
             //TODO differentiate parameters?
             updateFrame()
         }
@@ -27,7 +27,7 @@ class PlotlyFrame(val element: HTMLDivElement, meta: Configuration? = null) : Pl
     private val traces = HashMap<String, Trace>()
 
     private fun updateFrame() {
-        Plotly.react(element, traces.values.toList(), layout)
+        Plotly.react(element, traces.values.toList(), layout.config)
     }
 
     override fun get(key: String): Plot? {
@@ -44,9 +44,9 @@ class PlotlyFrame(val element: HTMLDivElement, meta: Configuration? = null) : Pl
         updateFrame()
     }
 
-    override fun configure(key: String, meta: Configuration) {
+    override fun configure(key: String, meta: Meta) {
         get(key)?.let {
-            it.meta.update(meta)
+            it.config.update(meta)
             updateFrame()
         }
     }

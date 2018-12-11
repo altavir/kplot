@@ -4,23 +4,13 @@ plugins {
 
 description = "JVM examples"
 
-repositories {
-    maven { url 'https://jitpack.io' }
-    mavenCentral()
-}
-
 dependencies {
     compile project(":kplot-jfreechart")
 
     testCompile "org.jetbrains.kotlin:kotlin-test-junit5"
 
-    testImplementation(
-            'org.junit.jupiter:junit-jupiter-api:5.2.0'
-    )
-    testRuntimeOnly(
-            'org.junit.jupiter:junit-jupiter-engine:5.2.0'
-    )
-    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+    testImplementation('org.junit.jupiter:junit-jupiter-api:5.2.0')
+    testRuntimeOnly('org.junit.jupiter:junit-jupiter-engine:5.2.0')
     //implementation 'com.github.altavir.kmath:kmath-jvm:dev-SNAPSHOT'
 }
 
@@ -37,7 +27,7 @@ test {
 
 sourceCompatibility = "1.8"
 
-task jfreechart(type: JavaExec){
+task jfreechart(type: JavaExec) {
     group = "example"
     classpath = sourceSets.main.runtimeClasspath
     main = 'scientifik.kplot.examples.JFreeChartFrameTestKt'

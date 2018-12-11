@@ -2,7 +2,6 @@ package scientifik.kplot.remote
 
 import hep.dataforge.meta.Meta
 import hep.dataforge.meta.StyledConfig
-import kotlinx.coroutines.experimental.launch
 import scientifik.kplot.Plot
 import scientifik.kplot.PlotData
 import scientifik.kplot.PlotFrame
@@ -28,16 +27,17 @@ class ClientPlotFrame(val remote: Remote, val id: String) : PlotFrame {
     }
 
     override fun remove(key: String) {
-        launch {
-            remote.respond(
-                    mapOf(
-                            "id" to id,
-                            "action" to "remove",
-                            "key" to key
-                    ),
-                    ""
-            )
-        }
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+//        launch {
+//            remote.respond(
+//                    mapOf(
+//                            "id" to id,
+//                            "action" to "remove",
+//                            "key" to key
+//                    ),
+//                    ""
+//            )
+//        }
     }
 
     override fun configure(key: String, meta: Meta) {

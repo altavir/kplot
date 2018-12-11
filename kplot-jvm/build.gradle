@@ -4,10 +4,8 @@ plugins {
 
 dependencies {
     expectedBy project(":kplot-common")
-    compile "com.github.altavir:dataforge-meta-jvm:$dfmeta_version"
-
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
-    compile 'org.jetbrains.kotlinx:kotlinx-coroutines-core:0.25.0'
+    compile "hep.dataforge:dataforge-meta-jvm:$dfmeta_version"
 
     testCompile "junit:junit:4.12"
     testCompile "org.jetbrains.kotlin:kotlin-test"
